@@ -1,6 +1,6 @@
 import Peer from 'peerjs';
 
-const CHUNK_SIZE = 14000; // 14KB güvenli WebRTC DataChannel boyutu
+const CHUNK_SIZE = 14000;
 
 class P2PService {
   constructor() {
@@ -69,12 +69,10 @@ class P2PService {
           resolve(id);
         });
 
-        // Gelen veri bağlantısı (chat, tema, davetler)
         this.peer.on('connection', (conn) => {
           this.setupDataConnection(conn);
         });
 
-        // Gelen ses / video araması
         this.peer.on('call', async (call) => {
           const mode = call.metadata?.mode || 'video';
           const callerName = call.metadata?.username || this.peersInfo.get(call.peer)?.username || 'Arkadaş';
@@ -117,7 +115,6 @@ class P2PService {
     });
   }
 
-  // Arkadaşın oda koduna bağlan (Asenkron & Gerçek Doğrulamalı)
   connectToPeerAsync(targetPeerId) {
     if (!this.peer || !targetPeerId) return Promise.resolve({ success: false, error: 'Oturum henüz hazır değil' });
     const cleanTargetId = targetPeerId.trim();
@@ -180,7 +177,7 @@ class P2PService {
       const remoteUsername = conn.metadata?.username || 'Arkadaş';
       this.peersInfo.set(conn.peer, { username: remoteUsername, connectedAt: Date.now() });
 
-      // Handshake gönder
+      // Handshake
       try {
         conn.send({
           type: 'HANDSHAKE',
@@ -257,7 +254,6 @@ class P2PService {
     });
   }
 
-  // Güvenli parça parça veya doğrudan veri gönderme
   sendToConn(conn, payload) {
     if (!conn || !conn.open) return;
     try {
@@ -281,19 +277,16 @@ class P2PService {
     } catch (_) {}
   }
 
-  // Tüm bağlı arkadaşlara veri gönder
   broadcast(payload) {
     this.connections.forEach((conn) => {
       this.sendToConn(conn, payload);
     });
   }
 
-  // Arama başlat ve tüm bağlı kişilere çağrı ilet
   callAllPeers(localStream, mode = 'video') {
     if (!this.peer) return;
     if (localStream) this.localStream = localStream;
 
-    // Önce veri kanalıyla çağrı sinyali gönder
     this.broadcast({
       type: 'INCOMING_CALL',
       mode,
@@ -301,7 +294,6 @@ class P2PService {
       callerPeerId: this.peerId
     });
 
-    // Medya akışını WebRTC call ile gönder
     if (this.localStream) {
       this.connections.forEach((conn, peerId) => {
         try {
