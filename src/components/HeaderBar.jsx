@@ -26,7 +26,7 @@ export default function HeaderBar({
         <MessageCircle size={12} color="#fff" />
       </div>
 
-      {/* Kullanıcı adı */}
+      {/* Username */}
       {user && (
         <span style={{
           fontSize: '11px', color: accentColor, fontWeight: '600',
@@ -39,7 +39,7 @@ export default function HeaderBar({
         </span>
       )}
 
-      {/* Şeffaflık kaydırıcı */}
+      {}
       <div style={{
         display: 'flex', alignItems: 'center', gap: '3px',
         background: 'rgba(255,255,255,0.05)', padding: '3px 6px',
@@ -57,10 +57,10 @@ export default function HeaderBar({
 
       <div style={{ flex: 1 }} />
 
-      {/* Sağ butonlar */}
+      {/* right buttons */}
       <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
 
-        {/* Sesli Arama */}
+        {}
         <button onClick={onToggleVoiceCall}
           title={isVoiceConnected ? 'Ses panelini aç/kapat' : 'Sesli Arama Başlat'}
           style={{
@@ -80,7 +80,7 @@ export default function HeaderBar({
           )}
         </button>
 
-        {/* Kamera */}
+        {/* Camera */}
         <button onClick={onToggleVideoCall}
           title={isVideoCallOpen ? 'Kamerayı Kapat' : 'Görüntülü Arama Başlat'}
           style={{
@@ -92,7 +92,7 @@ export default function HeaderBar({
           <Video size={12} />
         </button>
 
-        {/* Sabitle */}
+        {/* fix */}
         <button onClick={() => setIsPinned(!isPinned)}
           title={isPinned ? 'Sabitlemeyi Kaldır' : 'Ekrana Sabitle'}
           style={{
@@ -104,7 +104,7 @@ export default function HeaderBar({
           <Pin size={12} />
         </button>
 
-        {/* Tema */}
+        {/* Theme */}
         <button onClick={onOpenThemeStudio} title="Tema & Kişiselleştirme"
           style={{
             ...btnBase,
@@ -115,13 +115,13 @@ export default function HeaderBar({
           <Palette size={12} />
         </button>
 
-        {/* Küçült */}
+        {}
         <button ref={minimizeBtnRef} onClick={onMinimizeToEmblem}
           title="Simge Moduna Küçült" style={{ ...btnBase, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#64748b' }}>
           <Minus size={12} />
         </button>
 
-        {/* Çıkış */}
+        {}
         <button onClick={onLogout} title="Çıkış Yap"
           style={{ ...btnBase, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
           <LogOut size={12} />
