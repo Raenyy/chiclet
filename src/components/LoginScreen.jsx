@@ -67,7 +67,6 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
   }, [pos]);
 
   return (
-    // data-chiclet: mouse bu elemanın üzerindeyken tıklamalar Chiclet'e gelir
     <div
       data-chiclet="true"
       style={{
@@ -75,7 +74,7 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
         left: `${pos.x}px`,
         top: `${pos.y}px`,
         width: '340px',
-        pointerEvents: 'auto', // tıklanabilir
+        pointerEvents: 'auto', 
         zIndex: 1000
       }}
     >
@@ -90,7 +89,7 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
           overflow: 'hidden'
         }}
       >
-        {/* ÜST BAR — sürüklenebilir */}
+        {}
         <div
           onMouseDown={onHeaderMouseDown}
           style={{
@@ -139,7 +138,7 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
           </div>
         </div>
 
-        {/* İÇERİK */}
+        {}
         <div style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
           <div style={{
             width: '68px', height: '68px', borderRadius: '22px',
