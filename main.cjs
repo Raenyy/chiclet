@@ -25,9 +25,6 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
 
-  // ŞEFFAFLıK GEÇIŞ:
-  // Mouse şeffaf alandayken → tıklamalar oyun/masaüstüne geçer
-  // Mouse UI elemanının üzerindeyken → Chiclet yakalar
   ipcMain.on('set-ignore-mouse', (_, ignore) => {
     if (!mainWindow) return;
     if (ignore) {
@@ -39,7 +36,7 @@ function createWindow() {
 
   ipcMain.on('set-always-on-top', (_, pin) => {
     if (!mainWindow) return;
-    mainWindow.setAlwaysOnTop(pin); // sadece true/false, level yok
+    mainWindow.setAlwaysOnTop(pin); 
   });
 
   ipcMain.on('close-app', () => {
