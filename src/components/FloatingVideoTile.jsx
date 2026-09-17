@@ -41,7 +41,7 @@ export default function FloatingVideoTile({
 
   const accentColor = currentTheme?.accentColor || '#6366f1';
 
-  // Gerçek WebCam & P2P Karşı Taraf Akışı
+  //WebCam & P2P 
   useEffect(() => {
     if (participant.stream && videoRef.current) {
       if (videoRef.current.srcObject !== participant.stream) {
@@ -68,12 +68,12 @@ export default function FloatingVideoTile({
     }
   }, [isSelf, participant.isCamOn, participant.stream]);
 
-  // Sürükleme Mantığı (Ayrılmış modda) — global drag flag ile mouseup kaybolmasın
+  // global drag flag 
   const onTileMouseDown = useCallback((e) => {
     if (!isDetached || e.target.closest('button') || e.target.closest('input')) return;
     e.preventDefault();
     dragging.current = true;
-    window.__startDrag?.(); // setIgnoreMouseEvents'in mouseup'ı kesmesini önle
+    window.__startDrag?.(); 
     const rect = tileRef.current.getBoundingClientRect();
     dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
@@ -135,13 +135,13 @@ export default function FloatingVideoTile({
         flexShrink: 0
       }}
     >
-      {/* KAMERA GÖRÜNTÜSÜ & İÇ KATMANLAR (TAMAMEN ŞEFFAF CAM) */}
+      {}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: 'transparent'
       }}>
-        {/* Canlı Video / Avatar */}
+        {/* Live Video / Avatar */}
         {participant.isCamOn ? (
           (isSelf || participant.stream) ? (
             <video
@@ -184,7 +184,7 @@ export default function FloatingVideoTile({
           </div>
         )}
 
-        {/* 1. İÇ SOL TARAF: EKRANIN İÇİNDE SÜZÜLEN ÇIKARTMALAR */}
+        {}
         <div style={{
           position: 'absolute',
           top: '32px',
@@ -214,7 +214,7 @@ export default function FloatingVideoTile({
           ))}
         </div>
 
-        {/* 2. İÇ SAĞ/ÜST TARAF: KAFADAN ÇIKAN SALLANARAK SÜZÜLEN ŞEFFAF KONUŞMA BALONCUKLARI */}
+        {}
         <div style={{
           position: 'absolute',
           top: '24px',
@@ -259,7 +259,7 @@ export default function FloatingVideoTile({
           ))}
         </div>
 
-        {/* ÜST BİLGİ VE FİLTRE BUTONU */}
+        {}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
           padding: '5px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -311,7 +311,7 @@ export default function FloatingVideoTile({
           </div>
         </div>
 
-        {/* EFEKT SEÇİM AÇILIR MENÜSÜ */}
+        {}
         {isFilterMenuOpen && (
           <div style={{
             position: 'absolute', top: '28px', right: '8px', zIndex: 40,
@@ -338,7 +338,7 @@ export default function FloatingVideoTile({
         )}
       </div>
 
-      {/* ALT HIZLI MESAJ & ÇIKARTMA FIRLATMA ÇUBUĞU (ŞEFFAF) */}
+      {}
       <div style={{
         padding: '4px 6px',
         background: 'rgba(0,0,0,0.25)',
@@ -347,7 +347,7 @@ export default function FloatingVideoTile({
         alignItems: 'center',
         gap: '3px'
       }}>
-        {/* Çıkartma Butonları */}
+        {/* Sticker Buttons */}
         <button
           onClick={() => onSendSticker(participant.id, '🔥')}
           title="🔥 Alev Fırlat"
@@ -370,7 +370,7 @@ export default function FloatingVideoTile({
           🎮
         </button>
 
-        {/* Mesaj Yazma */}
+        {}
         <form onSubmit={handleSendSpeech} style={{ flex: 1, display: 'flex', gap: '2px' }}>
           <input
             type="text"
