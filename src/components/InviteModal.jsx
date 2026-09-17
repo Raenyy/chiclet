@@ -10,7 +10,6 @@ export default function InviteModal({ user, onClose }) {
   const [connectedPeers, setConnectedPeers] = useState(p2pService.getConnectedPeers());
 
   useEffect(() => {
-    // Kendi peerId hazır olduğunda al
     if (p2pService.peerId) {
       setMyRoomCode(p2pService.peerId);
     } else {
@@ -93,7 +92,7 @@ export default function InviteModal({ user, onClose }) {
           color: '#f1f5f9'
         }}
       >
-        {/* Modal Başlığı */}
+        {}
         <div style={{
           padding: '10px 14px',
           background: 'rgba(0,0,0,0.4)',
@@ -128,10 +127,10 @@ export default function InviteModal({ user, onClose }) {
           </button>
         </div>
 
-        {/* Modal İçeriği */}
+        {}
         <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-          {/* 1. KENDİ ODA KODUN (Arkadaşına Gönder) */}
+          {}
           <div style={{
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(255,255,255,0.08)',
@@ -195,7 +194,7 @@ export default function InviteModal({ user, onClose }) {
             </div>
           </div>
 
-          {/* 2. ARKADAŞININ ODA KODUNA BAĞLAN */}
+          {}
           <div style={{
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(255,255,255,0.08)',
@@ -253,7 +252,7 @@ export default function InviteModal({ user, onClose }) {
             </div>
           </div>
 
-          {/* 3. BAĞLI ARKADAŞLAR LİSTESİ */}
+          {}
           {connectedPeers.length > 0 && (
             <div style={{
               background: 'rgba(34,197,94,0.08)',
