@@ -1,0 +1,142 @@
+:root {
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --font-code: 'Fira Code', monospace;
+
+  /* Varsayılan Tema: Roblox Klasik Şeffaf Cam */
+  --bg-glass: rgba(18, 22, 34, 0.65);
+  --bg-glass-heavy: rgba(12, 16, 26, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --accent-color: #cdfcff;
+  --accent-gradient: linear-gradient(135deg, #c7f7fb 0%, #f9ffcb 100%);
+  --text-primary: #f0f4fc;
+  --text-secondary: #94a3b8;
+  --shadow-glow: 0 8px 32px 0 rgba(0, 240, 255, 0.15);
+  --radius-main: 16px;
+  --radius-sub: 10px;
+}
+
+/* Özel Kaydırma Çubuğu (Custom Scrollbar) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* Global scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body, html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-main);
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Şeffaf Cam Katmanı (Glassmorphism) */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-glow);
+  border-radius: var(--radius-main);
+  transition: all 0.3s ease;
+}
+
+/* Görüntülü Aramada Sağ Taraf Konuşma Baloncuğu Animasyonu */
+@keyframes speechBubbleIn {
+  0% { transform: scale(0) translateX(20px); opacity: 0; }
+  80% { transform: scale(1.05) translateX(0); }
+  100% { transform: scale(1) translateX(0); opacity: 1; }
+}
+
+.speech-bubble-right {
+  animation: speechBubbleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Görüntülü Aramada Kamera İÇİ Konuşma Baloncuğu - Kafadan Çıkan & Sallanarak Süzülen Akış */
+@keyframes bubbleFloatWobble {
+  0% {
+    transform: translateY(20px) scale(0.7) rotate(-5deg);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(0px) scale(1.03) rotate(3deg);
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-14px) scale(1.0) rotate(-3deg);
+    opacity: 0.95;
+  }
+  75% {
+    transform: translateY(-32px) scale(0.97) rotate(2deg);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-55px) scale(0.9) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.speech-bubble-wobble {
+  animation: bubbleFloatWobble 4.5s ease-out forwards;
+  position: relative;
+}
+
+/* Konuşma Baloncuğu Kuyruğu (Kafayı Gösteren Minik Ok) */
+.speech-bubble-wobble::after {
+  content: '''';
+  position: absolute;
+  bottom: -6px;
+  right: 18px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(15, 23, 42, 0.75);
+}
+
+/* Görüntülü Aramada Kamera İÇİ Çıkartma Süzülme Animasyonu */
+@keyframes stickerFloatInside {
+  0% { transform: translateY(14px) scale(0.6) rotate(-10deg); opacity: 0; }
+  20% { opacity: 1; transform: translateY(0px) scale(1.2) rotate(6deg); }
+  60% { opacity: 1; transform: translateY(-20px) scale(1.05) rotate(-5deg); }
+  100% { transform: translateY(-48px) scale(0.85) rotate(0deg); opacity: 0; }
+}
+
+.sticker-float-inside {
+  animation: stickerFloatInside 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}

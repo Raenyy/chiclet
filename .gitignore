@@ -1,0 +1,25 @@
+﻿# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist_electron/
+
+# Electron cache
+.webpack/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Env files
+.env
+.env.local
+# Environment variables
+.env
+.env.local
+.env.*.local
