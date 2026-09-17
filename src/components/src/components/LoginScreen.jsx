@@ -26,7 +26,7 @@ export default function LoginScreen({ onLogin }) {
       position: 'relative',
       zIndex: 10,
     }}>
-      {/* Üst Bar */}
+      {/* Top Bar */}
       <div style={{
         padding: '10px 14px',
         background: 'rgba(0,0,0,0.4)',
@@ -54,9 +54,9 @@ export default function LoginScreen({ onLogin }) {
         </div>
       </div>
 
-      {/* İçerik */}
+      {}
       <div style={{ padding: '36px 28px 28px' }}>
-        {/* Logo & İsim */}
+        {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{
             width: '64px', height: '64px', borderRadius: '20px',
@@ -75,7 +75,7 @@ export default function LoginScreen({ onLogin }) {
           </p>
         </div>
 
-        {/* Kullanıcı Adı Input */}
+        {/* Username Input */}
         <div style={{
           animation: shake ? 'shake 0.4s ease' : 'none',
           marginBottom: '14px'
@@ -106,7 +106,7 @@ export default function LoginScreen({ onLogin }) {
           />
         </div>
 
-        {/* Giriş Yap Butonu */}
+        {/* Login Button */}
         <button
           onClick={handleLogin}
           style={{
@@ -135,7 +135,7 @@ export default function LoginScreen({ onLogin }) {
           <ArrowRight size={16} />
         </button>
 
-        {/* Alt Ayarlar Butonu */}
+        {}
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <button
             onClick={() => alert('Tema ayarları yakında!')}
@@ -161,7 +161,7 @@ export default function LoginScreen({ onLogin }) {
         </div>
       </div>
 
-      {/* Shake Animasyonu */}
+      {/* Shake Animation */}
       <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
