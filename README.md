@@ -6,6 +6,20 @@ Proje, oyun oynarken veya başka bir uygulama kullanırken erişilebilen, özell
 
 > **Durum:** Geliştirme aşamasında.
 
+## Ekran Görüntüleri
+
+<p align="center">
+  <img src="screenshots/login.png" width="280" alt="Giriş Ekranı"/>
+  <img src="screenshots/chat.png" width="280" alt="Sohbet"/>
+</p>
+<p align="center">
+  <img src="screenshots/voice-video.png" width="420" alt="Sesli ve Görüntülü Arama"/>
+</p>
+<p align="center">
+  <img src="screenshots/themes.png" width="380" alt="Tema Seçici"/>
+  <img src="screenshots/studio.png" width="380" alt="Duvar Kağıdı Stüdyosu"/>
+</p>
+
 ## Özellikler
 
 * P2P tabanlı mesajlaşma
@@ -55,6 +69,10 @@ cd chiclet
 npm install
 npm run electron:dev
 ```
+
+### Hazır .exe (Windows)
+
+Kurulum gerektirmeden çalıştırmak için [Releases](../../releases) bölümünden indirilebilir.
 
 ## Geliştirme Notu
 
