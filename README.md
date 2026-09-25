@@ -1,83 +1,118 @@
-﻿# Chiclet
-
-**Chiclet**, masaüstünde kullanılmak üzere geliştirdiğim, WebRTC tabanlı bir sohbet uygulamasıdır. Mesajlaşma, sesli ve görüntülü iletişim gibi özellikleri tek bir arayüzde bir araya getirmeyi amaçlar.
-
-Proje, oyun oynarken veya başka bir uygulama kullanırken erişilebilen, özelleştirilebilir ve masaüstü üzerinde hareket ettirilebilen bir sohbet deneyimi oluşturma fikriyle geliştirilmektedir.
-
-> **Durum:** Geliştirme aşamasında.
-
-## Ekran Görüntüleri
+# Chiclet 🎀
 
 <p align="center">
-  <img src="screenshots/login.png" width="280" alt="Giriş Ekranı"/>
-  <img src="screenshots/chat.png" width="280" alt="Sohbet"/>
+  <img src="public/icon.png" width="96" height="96" alt="Chiclet Logo"/>
 </p>
+
 <p align="center">
-  <img src="screenshots/voice-video.png" width="420" alt="Sesli ve Görüntülü Arama"/>
+  <b>Masaüstünde oyun oynarken veya çalışırken arkadaşlarınızla kesintisiz iletişim kurabileceğiniz şık, özelleştirilebilir ve WebRTC tabanlı P2P sohbet uygulaması.</b>
 </p>
+
 <p align="center">
-  <img src="screenshots/themes.png" width="380" alt="Tema Seçici"/>
-  <img src="screenshots/studio.png" width="380" alt="Duvar Kağıdı Stüdyosu"/>
+  <a href="#özellikler">Özellikler</a> •
+  <a href="#ekran-görüntüleri">Ekran Görüntüleri</a> •
+  <a href="#kullanılan-teknolojiler">Teknolojiler</a> •
+  <a href="#kurulum">Kurulum</a> •
+  <a href="#lisans">Lisans</a>
 </p>
 
-## Özellikler
+---
 
-* P2P tabanlı mesajlaşma
-* Sesli iletişim
-* Görüntülü iletişim
-* Özelleştirilebilir tema ve arka plan
-* Taşınabilir ve yeniden boyutlandırılabilir sohbet penceresi
-* Masaüstü üzerinde kullanılabilen şeffaf pencere
-* Emoji ve çıkartma desteği
-* Yapay zekâ asistanı entegrasyonu
-* Bağlı kullanıcılar arasında tema senkronizasyonu
+## 📸 Ekran Görüntüleri
 
-## Kullanılan Teknolojiler
+<p align="center">
+  <img src="screenshots/login.png" width="310" alt="Giriş Ekranı"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/chat.png" width="310" alt="Sohbet Ekranı"/>
+</p>
 
-* **React** — Kullanıcı arayüzü
-* **Electron** — Masaüstü uygulaması
-* **Vite** — Geliştirme ve derleme altyapısı
-* **JavaScript** — Uygulama mantığı
-* **PeerJS / WebRTC** — P2P bağlantı ve iletişim
-* **Web Media API** — Ses ve görüntü erişimi
+<p align="center">
+  <img src="screenshots/voice-video.png" width="560" alt="Sesli ve Görüntülü Arama"/>
+</p>
 
-## Proje Yapısı
+<p align="center">
+  <img src="screenshots/themes.png" width="360" alt="Duvar Kağıtlarım"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/studio.png" width="360" alt="Duvar Kağıdı Stüdyosu"/>
+</p>
+
+---
+
+## ✨ Özellikler
+
+* **Uçtan Uca P2P Mesajlaşma:** Sunucusuz, PeerJS / WebRTC üzerinden doğrudan eşler arası hızlı iletişim.
+* **Sesli İletişim:** Mikrofon susturma, sağırlaştırma ve çağrı sonlandırma özelliklerine sahip sesli arama paneli.
+* **Görüntülü İletişim:** Dahili kamera yayını, katılımcı ekranları ve pencereleri ayırıp bağımsız hareket ettirebilme (Picture-in-Picture).
+* **Özel Duvar Kağıdı Stüdyosu:** Kendi duvar kağıdınızı çizebileceğiniz tuval; fırça, silgi, kova dolgusu, kalınlık ayarı, çıkartmalar ve fotoğraf yükleme desteği.
+* **Kişiselleştirilebilir Mesaj Baloncukları:** Kullanıcı ve AI mesaj balonları için degrade renk seçimi.
+* **Canlı Tema Senkronizasyonu:** Oluşturulan veya seçilen duvar kağıtları gruptaki tüm katılımcılara anında yansır.
+* **HUD Simge Modu:** Tek tıkla masaüstünde yüzen şeffaf konuşma balonu simgesine küçülme.
+* **Saydamlık & Sabitleme Kontrolleri:** Slider ile pencere şeffaflığını ayarlayabilme ve pencereyi her zaman en üstte tutma (Pin).
+* **Yapay Zekâ Asistanı (@ai):** Sohbet esnasında sorularınızı yanıtlayan yapay zekâ entegrasyonu.
+* **Emoji ve Çıkartma Kütüphanesi:** Zengin emoji kategorileri ve hızlı çıkartma gönderimi.
+
+---
+
+## 🛠️ Kullanılan Teknolojiler
+
+* **Electron** — Masaüstü uygulama çatısı
+* **React 18** — Kullanıcı arayüzü ve bileşen mimarisi
+* **Vite** — Hızlı derleme ve geliştirme ortamı
+* **PeerJS / WebRTC** — Eşler arası (P2P) ses, video ve veri iletimi
+* **Lucide React** — Modern arayüz ikonları
+* **Web Audio & MediaStream API** — Gerçek zamanlı mikrofon ve kamera yönetimi
+
+---
+
+## 📁 Proje Yapısı
 
 ```text
 chiclet/
-├── main.cjs
-├── package.json
+├── main.cjs              # Electron ana süreç yapılandırması
+├── package.json          # Bağımlılıklar ve derleme betikleri
+├── public/               # İkonlar ve statik varlıklar
+├── screenshots/          # README ekran görüntüleri
 └── src/
-    ├── App.jsx
-    ├── index.css
-    ├── components/
-    └── services/
+    ├── App.jsx           # Ana uygulama bileşeni
+    ├── index.css         # Global CSS ve animasyonlar
+    ├── components/       # UI bileşenleri (Header, Chat, Voice, Video, Studio)
+    └── services/         # WebRTC (P2PService) ve Tema yönetimi (ThemeService)
 ```
 
-## Kurulum
+---
+
+## 🚀 Kurulum ve Çalıştırma
 
 ### Gereksinimler
 
-* Node.js 18+
-* npm
+* [Node.js](https://nodejs.org/) (v18 veya üzeri)
+* npm veya yarn
 
-### Çalıştırma
+### Adımlar
 
 ```bash
-git clone https://github.com/KULLANICI/chiclet.git
+# Projeyi klonlayın
+git clone https://github.com/Raenyy/chiclet.git
+
+# Proje dizinine girin
 cd chiclet
+
+# Bağımlılıkları yükleyin
 npm install
+
+# Geliştirici modunda başlatın
 npm run electron:dev
 ```
 
-### Hazır .exe (Windows)
+### Windows Taşınabilir Sürüm Oluşturma (.exe)
 
-Kurulum gerektirmeden çalıştırmak için [Releases](../../releases) bölümünden indirilebilir.
+```bash
+npm run electron:build
+```
+Oluşturulan taşınabilir `.exe` dosyası `dist_electron` dizininde yer alacaktır.
 
-## Geliştirme Notu
+---
 
-Bu proje, masaüstü uygulamaları, gerçek zamanlı iletişim ve WebRTC tabanlı sistemler üzerine pratik yapmak amacıyla geliştirilmektedir. Yeni özellikler eklenmeye ve mevcut yapı iyileştirilmeye devam edilmektedir.
+## 📄 Lisans
 
-## Lisans
-
-MIT
+Bu proje [MIT](LICENSE) lisansı altında sunulmaktadır.
