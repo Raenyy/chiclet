@@ -38,7 +38,7 @@
 
 ---
 
-## ✨ Özellikler
+## Özellikler
 
 * **Uçtan Uca P2P Mesajlaşma:** Sunucusuz, PeerJS / WebRTC üzerinden doğrudan eşler arası hızlı iletişim.
 * **Sesli İletişim:** Mikrofon susturma, sağırlaştırma ve çağrı sonlandırma özelliklerine sahip sesli arama paneli.
@@ -53,7 +53,7 @@
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
+## Kullanılan Teknolojiler
 
 * **Electron** — Masaüstü uygulama çatısı
 * **React 18** — Kullanıcı arayüzü ve bileşen mimarisi
@@ -64,7 +64,7 @@
 
 ---
 
-## 📁 Proje Yapısı
+## Proje Yapısı
 
 ```text
 chiclet/
@@ -81,7 +81,7 @@ chiclet/
 
 ---
 
-## 🚀 Kurulum ve Çalıştırma
+## Kurulum ve Çalıştırma
 
 ### Gereksinimler
 
