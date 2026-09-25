@@ -9,11 +9,18 @@
 </p>
 
 <p align="center">
+  <a href="#doğrudan-indir">İndir</a> •
   <a href="#özellikler">Özellikler</a> •
   <a href="#ekran-görüntüleri">Ekran Görüntüleri</a> •
   <a href="#kullanılan-teknolojiler">Teknolojiler</a> •
-  <a href="#kurulum">Kurulum</a> •
+  <a href="#kurulum-ve-geliştirme">Geliştirici Kurulumu</a> •
   <a href="#lisans">Lisans</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Raenyy/chiclet/releases/download/v1.0.0/Chiclet.exe">
+    <img src="https://img.shields.io/badge/Windows-Chiclet.exe%20%C4%B0ndir%20(v1.0.0)-ff7aa2?style=for-the-badge&logo=windows&logoColor=white" alt="Chiclet.exe İndir"/>
+  </a>
 </p>
 
 ---
@@ -81,7 +88,15 @@ chiclet/
 
 ---
 
-## Kurulum ve Çalıştırma
+## Doğrudan İndir (Kurulumsuz / Taşınabilir)
+Geliştirme araçları yüklemeden hemen kullanmak için hazır Windows sürümünü tek tıkla indirebilirsiniz:
+
+* 👉 **[Chiclet.exe İndir (Windows Taşınabilir)](https://github.com/Raenyy/chiclet/releases/download/v1.0.0/Chiclet.exe)**
+* İndirdikten sonra kurulum yapmadan doğrudan çift tıklayarak çalıştırabilirsiniz.
+
+---
+
+## Geliştiriciler İçin Kurulum ve Çalıştırma
 
 ### Gereksinimler
 
