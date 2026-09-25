@@ -1,5 +1,5 @@
-﻿import React, { useState, useRef, useCallback } from 'react';
-import chicletLogo from '../assets/ChicletLogo.jpeg';
+import React, { useState, useRef, useCallback } from 'react';
+import chicletLogo from '../assets/ChicletLogoNew.png';
 
 export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = null, currentTheme }) {
   const [pos, setPos] = useState(() => {
@@ -28,8 +28,8 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
       if (!dragging.current) return;
       hasDragged.current = true;
       setPos({
-        x: Math.max(0, Math.min(window.innerWidth - 52, ev.clientX - dragOffset.current.x)),
-        y: Math.max(0, Math.min(window.innerHeight - 52, ev.clientY - dragOffset.current.y))
+        x: Math.max(0, Math.min(window.innerWidth - 56, ev.clientX - dragOffset.current.x)),
+        y: Math.max(0, Math.min(window.innerHeight - 56, ev.clientY - dragOffset.current.y))
       });
     };
 
@@ -60,12 +60,11 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
         position: 'fixed',
         left: `${pos.x}px`,
         top: `${pos.y}px`,
-        width: '52px',
-        height: '52px',
-        borderRadius: '16px',
-        background: '#ffffff',
-        border: '2px solid #000000',
-        boxShadow: '0 6px 18px rgba(0,0,0,0.18)',
+        width: '56px',
+        height: '56px',
+        borderRadius: '50%',
+        background: 'transparent',
+        border: 'none',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -73,19 +72,21 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
         zIndex: 9999,
         userSelect: 'none',
         pointerEvents: 'auto',
-        overflow: 'hidden',
-        transition: 'transform 0.15s, box-shadow 0.15s',
+        transition: 'transform 0.15s ease',
+        filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.25))'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.06)';
-        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)';
+        e.currentTarget.style.transform = 'scale(1.1)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.18)';
       }}
     >
-      <img src={chicletLogo} alt="Chiclet Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <img
+        src={chicletLogo}
+        alt="Chiclet Logo"
+        style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }}
+      />
 
       {unreadCount > 0 && (
         <span style={{

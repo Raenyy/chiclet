@@ -17,6 +17,7 @@ function createWindow() {
     alwaysOnTop: false,
     skipTaskbar: false,
     focusable: true,
+    icon: path.join(__dirname, 'public', 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
