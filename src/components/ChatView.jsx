@@ -161,21 +161,9 @@ export default function ChatView({
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-      {/* Sabit Arka Plan: Duvar kağıdı varsa duvar kağıdı, yoksa göz yormayan hafif pembemsi pastel zemin (Scroll ile ASLA kaymaz) */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundColor: currentTheme?.customWallpaper ? 'transparent' : 'rgba(252, 237, 241, 0.95)',
-        backgroundImage: currentTheme?.customWallpaper ? `url(${currentTheme.customWallpaper})` : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        opacity: opacity,
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
-
+      {/* Üst Kullanıcı Adı ve Davet Barı (Her zaman duvar kağıdının üstünde ve temiz) */}
       {!isMiniMode && !isVoiceConnected && (
-        <div style={{ padding: '8px 14px 4px 14px', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, position: 'relative', zIndex: 1 }}>
+        <div style={{ padding: '8px 14px 4px 14px', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, position: 'relative', zIndex: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '13px', fontWeight: '700', color: '#333333' }}>@{user || 'Kullaniciadin'}</span>
             {isPushToTalkActive && (
@@ -231,32 +219,53 @@ export default function ChatView({
         </div>
       )}
 
-      <div className="custom-scrollbar" style={{
-        flex: 1, padding: isMiniMode ? '6px 8px' : '10px 12px', overflowY: 'auto', overflowX: 'hidden',
-        display: 'flex', flexDirection: 'column', gap: '7px', minHeight: 0,
-        backgroundColor: 'transparent',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1 }} />
-        {!isMiniMode && messages.length === 0 && (
-          <div style={{ flex: 1, position: 'relative', zIndex: 1 }} />
-        )}
+      {/* ORTA: Yalnızca Mesaj Alanını Kapsayan Duvar Kağıdı ve Kaydırma Alanı */}
+      <div style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
+        {/* Sabit Arka Plan: Yalnızca mesaj alanını kaplar, üst ve alt barlara ASLA taşmaz ve kaymaz! */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: currentTheme?.customWallpaper ? 'transparent' : 'rgba(252, 237, 241, 0.95)',
+          backgroundImage: currentTheme?.customWallpaper ? `url(${currentTheme.customWallpaper})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: opacity,
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
 
-        {displayedMessages.map((msg) => {
-          if (msg.type === 'system') {
+        {/* Scrollable Mesaj Listesi */}
+        <div className="custom-scrollbar" style={{
+          position: 'absolute',
+          inset: 0,
+          padding: isMiniMode ? '6px 8px' : '10px 12px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '7px',
+          backgroundColor: 'transparent',
+          zIndex: 1
+        }}>
+          <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1 }} />
+          {!isMiniMode && messages.length === 0 && (
+            <div style={{ flex: 1, position: 'relative', zIndex: 1 }} />
+          )}
+
+          {displayedMessages.map((msg) => {
+            if (msg.type === 'system') {
+              return (
+                <div key={msg.id} style={{ alignSelf: 'center', margin: '4px 0', padding: '4px 12px', borderRadius: '14px', background: '#fff0f3', border: '1px solid #000', color: '#000', fontSize: '11px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', userSelect: 'none', position: 'relative', zIndex: 1 }}>
+                  <span style={{ fontSize: '11px' }}>🎨</span>
+                  <span style={{ color: '#000', fontWeight: '700' }}>@{msg.sender}</span>
+                  <span>{msg.text}</span>
+                </div>
+              );
+            }
+            const isInviteCard = msg.isVoiceInvite || msg.isVideoInvite || msg.type === 'voice_invite' || msg.type === 'video_invite';
+            const isCardActive = msg.type === 'video_invite' ? isVideoCallOpen : isVoiceConnected;
             return (
-              <div key={msg.id} style={{ alignSelf: 'center', margin: '4px 0', padding: '4px 12px', borderRadius: '14px', background: '#fff0f3', border: '1px solid #000', color: '#000', fontSize: '11px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', userSelect: 'none', position: 'relative', zIndex: 1 }}>
-                <span style={{ fontSize: '11px' }}>🎨</span>
-                <span style={{ color: '#000', fontWeight: '700' }}>@{msg.sender}</span>
-                <span>{msg.text}</span>
-              </div>
-            );
-          }
-          const isInviteCard = msg.isVoiceInvite || msg.isVideoInvite || msg.type === 'voice_invite' || msg.type === 'video_invite';
-          const isCardActive = msg.type === 'video_invite' ? isVideoCallOpen : isVoiceConnected;
-          return (
-            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: isInviteCard ? 'center' : msg.isUser ? 'flex-end' : 'flex-start', maxWidth: isInviteCard ? '95%' : '85%', width: isInviteCard ? '95%' : 'auto', position: 'relative', zIndex: 1 }}>
+              <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: isInviteCard ? 'center' : msg.isUser ? 'flex-end' : 'flex-start', maxWidth: isInviteCard ? '95%' : '85%', width: isInviteCard ? '95%' : 'auto', position: 'relative', zIndex: 1 }}>
               {!isMiniMode && !isInviteCard && (
                 <span style={{ fontSize: '10px', fontWeight: '700', marginBottom: '3px', color: msg.isAi ? '#2563eb' : '#444', textAlign: msg.isUser ? 'right' : 'left', paddingLeft: msg.isUser ? 0 : '4px', paddingRight: msg.isUser ? '4px' : 0 }}>
                   {msg.isAi ? '🤖 @ai' : msg.sender} · {msg.time}
@@ -313,6 +322,7 @@ export default function ChatView({
           </div>
         )}
         <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {showEmojiPanel && (
@@ -365,7 +375,9 @@ export default function ChatView({
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
-        flexShrink: 0
+        flexShrink: 0,
+        position: 'relative',
+        zIndex: 10
       }}>
         <button
           ref={emojiBtnRef}
