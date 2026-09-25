@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { p2pService } from '../services/P2PService';
 import MikrofonIcon from '../assets/MikrofonIcon.png';
 import KulaklikIcon from '../assets/KulaklikIcon.png';
@@ -102,44 +102,47 @@ export default function VoiceCallBar({ user, onEndCall, onSwitchToVideo, onMinim
         @{user || 'Kullaniciadin'}
       </div>
 
-      {/* Butonlar satırı */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+      {/* Butonlar satırı — Kesinlikle alt satıra kaymaz, tek sırada kompakt ve şık */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%', flexWrap: 'nowrap' }}>
         {/* Mikrofon */}
-        <button onClick={() => setIsMuted(!isMuted)} title={isMuted ? 'Mikrofonu Aç' : 'Kapat'} style={pillBtn(isMuted)}
+        <button onClick={() => setIsMuted(!isMuted)} title={isMuted ? 'Mikrofonu Aç' : 'Kapat'}
+          style={{ ...pillBtn(isMuted), flex: 1, padding: '4px 4px', fontSize: 10 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
-          <img src={MikrofonIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+          <img src={MikrofonIcon} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
           <span>{isMuted ? 'Sessiz' : 'Mikrofon'}</span>
         </button>
 
         {/* Kulaklık */}
-        <button onClick={() => setIsDeafened(!isDeafened)} title={isDeafened ? 'Sesi Aç' : 'Kapat'} style={pillBtn(isDeafened)}
+        <button onClick={() => setIsDeafened(!isDeafened)} title={isDeafened ? 'Sesi Aç' : 'Kapat'}
+          style={{ ...pillBtn(isDeafened), flex: 1, padding: '4px 4px', fontSize: 10 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
-          <img src={KulaklikIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+          <img src={KulaklikIcon} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
           <span>{isDeafened ? 'Sağır' : 'Kulaklık'}</span>
         </button>
 
         {/* Kamera */}
-        <button onClick={onSwitchToVideo} title="Görüntülüye Geç" style={pillBtn(false)}
+        <button onClick={onSwitchToVideo} title="Görüntülüye Geç"
+          style={{ ...pillBtn(false), flex: 1, padding: '4px 4px', fontSize: 10 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
-          <img src={KameraIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+          <img src={KameraIcon} alt="" style={{ width: 12, height: 12, objectFit: 'contain' }} />
           <span>Kamera</span>
         </button>
 
         {/* Ayrıl */}
-        <button onClick={onEndCall} title="Aramayı Sonlandır" style={{ ...pillBtn(false), background: '#fde8e8', color: '#b91c1c' }}
+        <button onClick={onEndCall} title="Aramayı Sonlandır"
+          style={{ ...pillBtn(false), flex: 1, padding: '4px 4px', fontSize: 10, background: '#fde8e8', color: '#b91c1c' }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
           <span>📵</span>
           <span>Ayrıl</span>
         </button>
 
-        <div style={{ flex: 1 }} />
-
         {/* Davet Et */}
-        <button onClick={handleInviteToChat} title="Davet Gönder" style={{ ...pillBtn(false), background: '#e6d3d9' }}
+        <button onClick={handleInviteToChat} title="Davet Gönder"
+          style={{ ...pillBtn(false), flex: 1.1, padding: '4px 4px', fontSize: 10, background: '#e6d3d9' }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
           <span>👋</span>
