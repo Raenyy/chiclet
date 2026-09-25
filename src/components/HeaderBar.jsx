@@ -1,5 +1,36 @@
 import React from 'react';
-import { Pin, Eye, Palette, Minus, LogOut, MessageCircle, Phone, Video } from 'lucide-react';
+import chicletLogo from '../assets/ChicletLogoNew.jpg';
+import KameraIcon from '../assets/KameraIcon.png';
+import SabitlemeIcon from '../assets/SabitlemeIcon.png';
+import AramaIcon from '../assets/AramaIcon.png';
+
+const hoverBtn = {
+  transition: 'transform 0.1s ease, box-shadow 0.1s ease',
+};
+
+function IconBtn({ onClick, title, bg, active, children, style = {}, ...rest }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        width: 26, height: 26, position: 'absolute',
+        background: bg,
+        boxShadow: active ? '0 0 0 2px #A2E5FF, 1px 1px 4px rgba(0,0,0,0.25)' : '1px 1px 4px rgba(0,0,0,0.25)',
+        borderRadius: 8, border: '1px black solid', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 0, ...hoverBtn, ...style
+      }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = active ? '0 0 0 2px #A2E5FF, 1px 3px 6px rgba(0,0,0,0.20)' : '1px 3px 6px rgba(0,0,0,0.20)'; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = active ? '0 0 0 2px #A2E5FF, 1px 1px 4px rgba(0,0,0,0.25)' : '1px 1px 4px rgba(0,0,0,0.25)'; }}
+      onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; }}
+      onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function HeaderBar({
   opacity, setOpacity, isPinned, setIsPinned,
@@ -8,131 +39,79 @@ export default function HeaderBar({
   onToggleVideoCall, isVideoCallOpen,
   currentTheme, onOpenThemeStudio
 }) {
-  const accentColor = currentTheme?.accentColor || '#6366f1';
-  const accentGradient = currentTheme?.accentGradient || 'linear-gradient(135deg, #6366f1, #8b5cf6)';
-
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', padding: '7px 10px',
-      background: 'rgba(0,0,0,0.45)', borderBottom: '1px solid rgba(255,255,255,0.07)',
-      cursor: 'grab', flexShrink: 0, gap: '5px', minHeight: '40px', overflow: 'hidden',
-      WebkitAppRegion: 'no-drag'
+      width: 'calc(100% - 20px)',
+      height: 39,
+      position: 'relative',
+      background: '#F3A6BA',
+      boxShadow: '2px 4px 4px 1px rgba(0,0,0,0.40)',
+      overflow: 'visible',
+      borderRadius: 8,
+      outline: '1px black solid',
+      flexShrink: 0,
+      margin: '12px 10px 0 10px',
+      boxSizing: 'border-box'
     }}>
-      {/* Logo */}
-      <div style={{
-        width: '22px', height: '22px', borderRadius: '7px', flexShrink: 0,
-        background: accentGradient, display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        <MessageCircle size={12} color="#fff" />
+
+      {/* Logo kutusu */}
+      <div style={{ width: 27, height: 27, left: 6, top: 6, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 6, outline: '1px black solid', outlineOffset: '-1px' }}>
+        <img style={{ width: 31, height: 31, left: -2, top: -2, position: 'absolute' }} src={chicletLogo} alt="Logo" draggable={false} />
       </div>
 
-      {/* Kullanıcı adı */}
-      {user && (
-        <span style={{
-          fontSize: '11px', color: accentColor, fontWeight: '600',
-          background: `${accentColor}18`, padding: '1px 6px',
-          borderRadius: '4px', border: `1px solid ${accentColor}35`,
-          whiteSpace: 'nowrap', maxWidth: '80px',
-          overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1
-        }}>
-          @{user}
-        </span>
-      )}
-
-      {/* Şeffaflık kaydırıcı */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '3px',
-        background: 'rgba(255,255,255,0.05)', padding: '3px 6px',
-        borderRadius: '6px', flexShrink: 0
-      }}>
-        <Eye size={11} color="#64748b" />
-        <input
-          type="range" min="0.05" max="0.95" step="0.05"
-          value={opacity}
-          onChange={(e) => setOpacity(parseFloat(e.target.value))}
-          style={{ width: '44px', cursor: 'pointer', accentColor }}
-          title={`Şeffaflık: %${Math.round(opacity * 100)}`}
-        />
+      {/* Opacity slider */}
+      <div title={`Şeffaflık: %${Math.round(opacity * 100)}`} style={{ width: 116, height: 11, left: 61, top: 14, position: 'absolute', background: '#D9D9D9', borderRadius: 4, border: '0.20px black solid', cursor: 'pointer' }}>
+        <div style={{ width: `${Math.round(opacity * 100)}%`, height: '100%', background: '#7FA5E2', boxShadow: '0px 2px 2px rgba(0,0,0,0.25) inset', border: '0.50px black solid', borderRadius: 4 }} />
+        <div style={{ width: 19, height: 19, left: `calc(${Math.round(opacity * 100)}% - 9px)`, top: -4, position: 'absolute', background: '#7FA5E2', boxShadow: '0px 2px 2px rgba(0,0,0,0.25) inset', borderRadius: 9999, border: '0.50px black solid' }} />
+        <input type="range" min="0.05" max="0.95" step="0.05" value={opacity} onChange={e => setOpacity(parseFloat(e.target.value))} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', zIndex: 10 }} />
       </div>
 
-      <div style={{ flex: 1 }} />
+      {/* Ses butonu — left:205 */}
+      <IconBtn onClick={onToggleVoiceCall} title={isVoiceConnected ? 'Ses Paneli' : 'Sesli Arama'} bg={isVoiceConnected ? '#A2E5FF' : 'rgba(252,237,241,0.99)'} active={isVoiceConnected} style={{ left: 205, top: 7 }}>
+        <img src={AramaIcon} alt="Ses" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+      </IconBtn>
 
-      {/* Sağ butonlar */}
-      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+      {/* Kamera butonu — left:237 */}
+      <IconBtn onClick={onToggleVideoCall} title={isVideoCallOpen ? 'Kamerayı Kapat' : 'Kamera Aç'} bg={isVideoCallOpen ? '#A2E5FF' : '#FCEDF1'} active={isVideoCallOpen} style={{ left: 237, top: 7 }}>
+        <img src={KameraIcon} alt="Kamera" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+      </IconBtn>
 
-        {/* Sesli Arama */}
-        <button onClick={onToggleVoiceCall}
-          title={isVoiceConnected ? 'Ses panelini aç/kapat' : 'Sesli Arama Başlat'}
-          style={{
-            ...btnBase,
-            background: isVoiceConnected ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${isVoiceConnected ? '#22c55e' : 'rgba(255,255,255,0.1)'}`,
-            color: isVoiceConnected ? '#4ade80' : '#64748b',
-            position: 'relative'
-          }}>
-          <Phone size={12} />
-          {isVoiceConnected && (
-            <span style={{
-              position: 'absolute', top: '-2px', right: '-2px',
-              width: '6px', height: '6px', borderRadius: '50%',
-              background: '#22c55e', boxShadow: '0 0 6px #22c55e'
-            }} />
-          )}
-        </button>
+      {/* Sabitle butonu — left:269 */}
+      <IconBtn onClick={() => setIsPinned(!isPinned)} title={isPinned ? 'Sabitlemeyi Kaldır' : 'Sabitle'} bg={isPinned ? '#A2E5FF' : '#FCEDF1'} active={isPinned} style={{ left: 269, top: 7 }}>
+        <img src={SabitlemeIcon} alt="Sabitle" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+      </IconBtn>
 
-        {/* Kamera */}
-        <button onClick={onToggleVideoCall}
-          title={isVideoCallOpen ? 'Kamerayı Kapat' : 'Görüntülü Arama Başlat'}
-          style={{
-            ...btnBase,
-            background: isVideoCallOpen ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${isVideoCallOpen ? '#22c55e' : 'rgba(255,255,255,0.1)'}`,
-            color: isVideoCallOpen ? '#4ade80' : '#64748b',
-          }}>
-          <Video size={12} />
-        </button>
+      {/* Tema butonu — left:301 */}
+      <IconBtn onClick={onOpenThemeStudio} title="Tema & Duvar Kağıdı" bg='#FCEDF1' style={{ left: 301, top: 7, boxShadow: '1px 1px 4px rgba(0,0,0,0.30)', fontSize: 14 }}>
+        🎨
+      </IconBtn>
 
-        {/* Sabitle */}
-        <button onClick={() => setIsPinned(!isPinned)}
-          title={isPinned ? 'Sabitlemeyi Kaldır' : 'Ekrana Sabitle'}
-          style={{
-            ...btnBase,
-            background: isPinned ? `${accentColor}25` : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${isPinned ? accentColor : 'rgba(255,255,255,0.1)'}`,
-            color: isPinned ? accentColor : '#64748b',
-          }}>
-          <Pin size={12} />
-        </button>
+      {/* Sarı minimize — left:333 */}
+      <button
+        ref={minimizeBtnRef}
+        onClick={onMinimizeToEmblem}
+        title="Simge Moduna Küçült"
+        style={{ width: 26, height: 26, left: 333, top: 7, position: 'absolute', background: '#F7D797', boxShadow: '1px 1px 4px rgba(0,0,0,0.30), 0px 2px 2px rgba(0,0,0,0.25) inset', borderRadius: 8, border: '1px black solid', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 15, fontWeight: '900', color: '#1E1E1E', lineHeight: 1, ...hoverBtn }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.30), 0px 2px 2px rgba(0,0,0,0.25) inset'; }}
+        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; }}
+        onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      >
+        &#8722;
+      </button>
 
-        {/* Tema */}
-        <button onClick={onOpenThemeStudio} title="Tema & Kişiselleştirme"
-          style={{
-            ...btnBase,
-            background: `${accentColor}15`,
-            border: `1px solid ${accentColor}40`,
-            color: accentColor,
-          }}>
-          <Palette size={12} />
-        </button>
-
-        {/* Küçült */}
-        <button ref={minimizeBtnRef} onClick={onMinimizeToEmblem}
-          title="Simge Moduna Küçült" style={{ ...btnBase, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#64748b' }}>
-          <Minus size={12} />
-        </button>
-
-        {/* Çıkış */}
-        <button onClick={onLogout} title="Çıkış Yap"
-          style={{ ...btnBase, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
-          <LogOut size={12} />
-        </button>
-      </div>
+      {/* Kırmızı kapat — left:365 */}
+      <button
+        onClick={onLogout}
+        title="Çıkış Yap"
+        style={{ width: 26, height: 26, left: 365, top: 7, position: 'absolute', background: '#F19191', boxShadow: '1px 1px 4px rgba(0,0,0,0.30), 0px 1px 3px rgba(0,0,0,0.25) inset', borderRadius: 8, border: '1px black solid', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 13, fontWeight: '700', color: '#1E1E1E', lineHeight: 1, ...hoverBtn }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.30), 0px 1px 3px rgba(0,0,0,0.25) inset'; }}
+        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; }}
+        onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      >
+        &#10005;
+      </button>
     </div>
   );
 }
-
-const btnBase = {
-  border: 'none', borderRadius: '7px', padding: '5px',
-  cursor: 'pointer', display: 'flex', alignItems: 'center',
-  justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s'
-};

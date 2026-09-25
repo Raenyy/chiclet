@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { MessageSquare } from 'lucide-react';
+﻿import React, { useState, useRef, useCallback } from 'react';
+import chicletLogo from '../assets/ChicletLogo.jpeg';
 
 export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = null, currentTheme }) {
   const [pos, setPos] = useState(() => {
@@ -12,9 +12,6 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
   const dragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const hasDragged = useRef(false);
-
-  const accentColor = currentTheme?.accentColor || '#6366f1';
-  const glowColor = currentTheme?.glowColor || 'rgba(99,102,241,0.35)';
 
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
@@ -65,11 +62,10 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
         top: `${pos.y}px`,
         width: '52px',
         height: '52px',
-        borderRadius: '14px',
-        background: 'rgba(13, 17, 28, 0.88)',
-        backdropFilter: 'blur(12px)',
-        border: `1px solid ${accentColor}50`,
-        boxShadow: `0 8px 24px rgba(0,0,0,0.5), 0 0 20px ${glowColor}`,
+        borderRadius: '16px',
+        background: '#ffffff',
+        border: '2px solid #000000',
+        boxShadow: '0 6px 18px rgba(0,0,0,0.18)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -77,28 +73,37 @@ export default function HudEmblemWidget({ onExpand, unreadCount = 0, spawnPos = 
         zIndex: 9999,
         userSelect: 'none',
         pointerEvents: 'auto',
-        transition: 'box-shadow 0.2s, border-color 0.2s',
+        overflow: 'hidden',
+        transition: 'transform 0.15s, box-shadow 0.15s',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0,0,0,0.5), 0 0 28px ${glowColor}`;
-        e.currentTarget.style.borderColor = accentColor;
+        e.currentTarget.style.transform = 'scale(1.06)';
+        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0,0,0,0.5), 0 0 20px ${glowColor}`;
-        e.currentTarget.style.borderColor = `${accentColor}50`;
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.18)';
       }}
     >
-      <MessageSquare size={22} color={accentColor} />
+      <img src={chicletLogo} alt="Chiclet Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
       {unreadCount > 0 && (
         <span style={{
-          position: 'absolute', top: '-5px', right: '-5px',
-          width: '18px', height: '18px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #ef4444, #f97316)',
-          color: '#fff', fontSize: '10px', fontWeight: 'bold',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 0 8px rgba(239,68,68,0.6)',
-          border: '1px solid rgba(0,0,0,0.3)'
+          position: 'absolute',
+          top: '-4px',
+          right: '-4px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          background: '#fce38a',
+          color: '#000000',
+          fontSize: '11px',
+          fontWeight: '800',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '1.5px solid #000000',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
         }}>
           {unreadCount}
         </span>

@@ -8,19 +8,16 @@ export default function VideoCallView({ onCloseCall }) {
   const [detachedFriendVideo, setDetachedFriendVideo] = useState(false);
   const [detachedMyVideo, setDetachedMyVideo] = useState(false);
 
-  // Sağ tarafta çıkacak konuşma baloncukları state'i
   const [speechBubbles, setSpeechBubbles] = useState([
     { id: '1', text: 'Kanka sağ koridoru tutuyorum! 🎮', side: 'right' }
   ]);
 
-  // Sol tarafta uçacak çıkartma ve emojiler state'i
   const [floatingStickers, setFloatingStickers] = useState([
     { id: '1', emoji: '🔥', side: 'left' }
   ]);
 
   const [callInputText, setCallInputText] = useState('');
 
-  // Konuşma Baloncuğu Gönder (Sağ Taraf)
   const handleSendCallMessage = () => {
     if (!callInputText.trim()) return;
     const newBubble = {
@@ -31,13 +28,11 @@ export default function VideoCallView({ onCloseCall }) {
     setSpeechBubbles(prev => [...prev, newBubble]);
     setCallInputText('');
 
-    // 4 saniye sonra baloncuk kaybolsun
     setTimeout(() => {
       setSpeechBubbles(prev => prev.filter(b => b.id !== newBubble.id));
     }, 4500);
   };
 
-  // Çıkartma/Emoji Uçur (Sol Taraf)
   const handleTriggerSticker = (emoji) => {
     const newSticker = {
       id: Date.now().toString(),
@@ -46,7 +41,6 @@ export default function VideoCallView({ onCloseCall }) {
     };
     setFloatingStickers(prev => [...prev, newSticker]);
 
-    // 3 saniye sonra uçuşup kaybolsun
     setTimeout(() => {
       setFloatingStickers(prev => prev.filter(s => s.id !== newSticker.id));
     }, 3000);
@@ -54,7 +48,7 @@ export default function VideoCallView({ onCloseCall }) {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', background: '#0a0d14', position: 'relative', overflow: 'hidden' }}>
-      {/* Üst Bar Kontrolleri */}
+      {}
       <div style={{
         padding: '8px 14px',
         background: 'rgba(0, 0, 0, 0.5)',
@@ -70,7 +64,7 @@ export default function VideoCallView({ onCloseCall }) {
           <span style={{ fontSize: '10px', color: '#94a3b8' }}>02:45</span>
         </div>
 
-        {/* Görüntü Filtresi Seçimi */}
+        {}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ fontSize: '10px', color: '#94a3b8' }}>Efekt:</span>
           <select
@@ -94,10 +88,10 @@ export default function VideoCallView({ onCloseCall }) {
         </div>
       </div>
 
-      {/* Kamera Izgara Alanı (Video Feed Grid) */}
+      {}
       <div style={{ flex: 1, padding: '12px', display: 'grid', gridTemplateColumns: detachedFriendVideo || detachedMyVideo ? '1fr' : '1fr 1fr', gap: '12px', position: 'relative' }}>
         
-        {/* 1. ARKADAŞIN KAMERASI (Eğer Ayrılmadıysa) */}
+        {}
         {!detachedFriendVideo && (
           <div style={{
             position: 'relative',
@@ -110,20 +104,20 @@ export default function VideoCallView({ onCloseCall }) {
             justifyContent: 'center',
             filter: filterEffect === 'cyberpunk' ? 'hue-rotate(90deg) contrast(1.2)' : filterEffect === 'vhs' ? 'sepia(0.3) saturate(1.4)' : 'none'
           }}>
-            {/* Simüle Edilen Canlı Arkadaş Kamerası */}
+            {}
             <img
               src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=600&q=80"
               alt="Friend Cam"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
 
-            {/* Arkadaş İsim Rozeti */}
+            {}
             <div style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(0,0,0,0.6)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }} />
               Gamer_Duo (Arkadaşın)
             </div>
 
-            {/* Bağımsız Pencere Yap (Detach) Butonu */}
+            {}
             <button
               onClick={() => setDetachedFriendVideo(true)}
               style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', padding: '4px', borderRadius: '6px', cursor: 'pointer' }}
@@ -132,7 +126,7 @@ export default function VideoCallView({ onCloseCall }) {
               <ExternalLink size={14} />
             </button>
 
-            {/* ⭐ SAĞ TARAF: KONUŞMA BALONCUKLARI */}
+            {}
             <div style={{
               position: 'absolute',
               top: '20%',
@@ -164,7 +158,7 @@ export default function VideoCallView({ onCloseCall }) {
               ))}
             </div>
 
-            {/* ⭐ SOL TARAF: UÇAN ÇIKARTMA & EMOJİLER */}
+            {}
             <div style={{
               position: 'absolute',
               bottom: '20%',
@@ -191,7 +185,7 @@ export default function VideoCallView({ onCloseCall }) {
           </div>
         )}
 
-        {/* 2. KENDİ KAMERAN (Eğer Ayrılmadıysa) */}
+        {}
         {!detachedMyVideo && (
           <div style={{
             position: 'relative',
@@ -231,7 +225,7 @@ export default function VideoCallView({ onCloseCall }) {
         )}
       </div>
 
-      {/* Eğer Bir Kamera Ayrıldıysa (Detached Widget Uyarısı) */}
+      {}
       {(detachedFriendVideo || detachedMyVideo) && (
         <div style={{ padding: '6px 14px', background: 'rgba(37, 99, 235, 0.15)', borderTop: '1px solid rgba(59, 130, 246, 0.3)', color: '#60a5fa', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span>📌 Kamera penceresi bağımsız olarak ayrıldı. Oyun köşesine iğneleyebilirsin.</span>
@@ -244,10 +238,10 @@ export default function VideoCallView({ onCloseCall }) {
         </div>
       )}
 
-      {/* Alt Hızlı Çıkartma ve Konuşma Baloncuğu Gönderim Barı */}
+      {}
       <div style={{ padding: '8px 12px', background: 'rgba(0, 0, 0, 0.4)', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         
-        {/* Hızlı Çıkartma Butonları (Sol Tarafta Uçacaklar) */}
+        {}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '10px', color: '#94a3b8' }}>Sol Çıkartma FX:</span>
           {['🔥', '😎', '👏', '🚀', '💀', '👑'].map(emoji => (
@@ -271,7 +265,7 @@ export default function VideoCallView({ onCloseCall }) {
           ))}
         </div>
 
-        {/* Konuşma Baloncuğu Mesaj İnputı (Sağ Tarafta Çıkacak) */}
+        {}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input
             type="text"
@@ -298,7 +292,7 @@ export default function VideoCallView({ onCloseCall }) {
           </button>
         </div>
 
-        {/* Alt Arama Kontrolleri (Mikrofon, Kamera, Kapat) */}
+        {}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', paddingTop: '4px' }}>
           <button
             onClick={() => setIsMicOn(!isMicOn)}

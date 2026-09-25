@@ -61,7 +61,7 @@ export default function ChatWindow({ user, onLogout, currentTheme, onOpenThemeSt
   const [isVideoMinimized, setIsVideoMinimized] = useState(false);
   const [isVideoDetached, setIsVideoDetached] = useState(false);
 
-  const [size, setSize] = useState({ w: 340, h: 480 });
+  const [size, setSize] = useState({ w: 420, h: 500 });
   const [pos, setPos] = useState(() => ({
     x: Math.round(window.innerWidth / 2 - 170),
     y: Math.round(window.innerHeight / 2 - 240)
@@ -73,11 +73,9 @@ export default function ChatWindow({ user, onLogout, currentTheme, onOpenThemeSt
   const minimizeBtnRef = useRef(null);
   const windowRef = useRef(null);
 
-  const customWallpaper = currentTheme?.customWallpaper;
-  const wallpaperOpacity = Math.max(0, (opacity - 0.2) / 0.8);
 
   const isDockedVideo = isVideoCallOpen && !isVideoMinimized && !isVideoDetached;
-  const totalW = isDockedVideo ? size.w + 280 : size.w;
+  const totalW = isDockedVideo ? size.w + 272 : size.w;
 
   const isMiniMode = size.w < MINI_W || size.h < MINI_H;
 
@@ -238,19 +236,17 @@ export default function ChatWindow({ user, onLogout, currentTheme, onOpenThemeSt
           top: `${pos.y}px`,
           width: `${totalW}px`,
           height: `${size.h}px`,
-          background: `rgba(13, 17, 28, ${opacity})`,
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: isPinned ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.08)',
+          background: `rgba(254, 205, 214, ${opacity})`,
+          border: '2px solid #000000',
           boxShadow: isPinned
-            ? '0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(99,102,241,0.25)'
-            : '0 20px 60px rgba(0,0,0,0.6)',
-          borderRadius: '16px',
+            ? '0 14px 40px rgba(0,0,0,0.22), 0 0 0 2px #5bc8f5'
+            : '0 12px 36px rgba(0,0,0,0.18)',
+          borderRadius: '18px',
           flexDirection: 'row',
           overflow: 'hidden',
           zIndex: 100,
           pointerEvents: 'auto',
-          transition: 'width 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s',
+          transition: 'width 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
           userSelect: 'none',
         }}
       >
@@ -260,13 +256,6 @@ export default function ChatWindow({ user, onLogout, currentTheme, onOpenThemeSt
           display: 'flex', flexDirection: 'column',
           position: 'relative', flexShrink: 0
         }}>
-          {customWallpaper && (
-            <div style={{
-              position: 'absolute', inset: 0,
-              backgroundImage: `url(${customWallpaper})`, backgroundSize: 'cover',
-              opacity: wallpaperOpacity, pointerEvents: 'none', zIndex: 0
-            }} />
-          )}
 
           {/* Header — mini mode: thin drag strip */}
           {isMiniMode ? (
@@ -318,6 +307,7 @@ export default function ChatWindow({ user, onLogout, currentTheme, onOpenThemeSt
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1, minHeight: 0 }}>
             <ChatView
               user={user} currentTheme={currentTheme} isMiniMode={isMiniMode}
+              opacity={opacity}
               isVoiceConnected={isVoiceConnected}
               onJoinVoiceCall={() => { setIsVoiceConnected(true); setIsVoicePanelVisible(true); }}
               onRegisterSendVoiceInvite={(fn) => { sendVoiceInviteToChatRef.current = fn; }}

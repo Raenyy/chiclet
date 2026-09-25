@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, Hash, UserPlus, Sticker, Mic, PhoneCall, Video, Search, LogOut } from 'lucide-react';
+import { Send, Bot, UserPlus, Sticker, Mic, PhoneCall, Video, Search, LogOut } from 'lucide-react';
 import { askRealAi } from '../services/AiBotService';
 import { subscribeToThemeChanges } from '../services/ThemeService';
 import { p2pService } from '../services/P2PService';
@@ -26,7 +26,7 @@ const DEFAULT_STICKERS = [
 ];
 
 export default function ChatView({
-  user, isMiniMode, currentTheme,
+  user, isMiniMode, currentTheme, opacity = 0.88,
   isVoiceConnected, onJoinVoiceCall, onRegisterSendVoiceInvite,
   isVideoCallOpen, onJoinVideoCall, onRegisterSendVideoInvite,
   onNewMessageArrival
@@ -161,47 +161,88 @@ export default function ChatView({
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-      {!isMiniMode && (
-        <div style={{ padding: '7px 14px', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      {!isMiniMode && !isVoiceConnected && (
+        <div style={{ padding: '8px 14px 4px 14px', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Hash size={14} color="#64748b" />
-            <span style={{ fontSize: '12px', fontWeight: '600', color: '#94a3b8' }}>genel</span>
-            <span style={{ fontSize: '10px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '1px 7px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)' }}>
-              Çevrimici
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: '#333333' }}>@{user || 'Kullaniciadin'}</span>
             {isPushToTalkActive && (
-              <span style={{ fontSize: '10px', background: 'rgba(99,102,241,0.15)', color: '#818cf8', padding: '2px 7px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '3px', border: '1px solid rgba(99,102,241,0.3)' }}>
+              <span style={{ fontSize: '10px', background: '#9de3fe', color: '#000', padding: '2px 7px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '3px', border: '1px solid #000' }}>
                 <Mic size={10} /> Konuşuluyor...
               </span>
             )}
-            <button onClick={() => setIsInviteModalOpen(true)} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: '#94a3b8', borderRadius: '7px', padding: '4px 9px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button
+              onClick={() => setIsInviteModalOpen(true)}
+              style={{
+                background: '#e6d3d9',
+                border: 'none',
+                color: '#444444',
+                borderRadius: '12px',
+                padding: '4px 14px',
+                fontSize: '11px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontFamily: 'inherit'
+              }}
+            >
               <UserPlus size={11} />
               {connectedPeerCount > 0 ? 'Oda (' + (connectedPeerCount + 1) + ')' : 'Davet Et'}
             </button>
             {connectedPeerCount > 0 && (
-              <button onClick={handleLeaveChatRoom} title="Odadan Ayrıl" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', padding: '3px 8px', borderRadius: '7px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'inherit' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; }}
-              ><LogOut size={11} color="#f87171" /> Ayrıl</button>
+              <button
+                onClick={handleLeaveChatRoom}
+                title="Odadan Ayrıl"
+                style={{
+                  background: '#fca5a5',
+                  border: '1px solid #000',
+                  color: '#000',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontFamily: 'inherit'
+                }}
+              >
+                <LogOut size={11} color="#000" /> Ayrıl
+              </button>
             )}
           </div>
         </div>
       )}
 
-      <div className="custom-scrollbar" style={{ flex: 1, padding: isMiniMode ? '6px 8px' : '12px 14px', overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: '7px', minHeight: 0 }}>
-        <div style={{ marginTop: 'auto' }} />
+      <div className="custom-scrollbar" style={{
+        flex: 1, padding: isMiniMode ? '6px 8px' : '10px 12px', overflowY: 'auto', overflowX: 'hidden',
+        display: 'flex', flexDirection: 'column', gap: '7px', minHeight: 0,
+        backgroundColor: 'transparent',
+        position: 'relative'
+      }}>
+        {currentTheme?.customWallpaper && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${currentTheme.customWallpaper})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            opacity: opacity, pointerEvents: 'none', zIndex: 0
+          }} />
+        )}
+        <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1 }} />
         {!isMiniMode && messages.length === 0 && (
-          <div style={{ flex: 1 }} />
+          <div style={{ flex: 1, position: 'relative', zIndex: 1 }} />
         )}
 
         {displayedMessages.map((msg) => {
           if (msg.type === 'system') {
             return (
-              <div key={msg.id} style={{ alignSelf: 'center', margin: '4px 0', padding: '4px 12px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontSize: '10.5px', display: 'flex', alignItems: 'center', gap: '5px', userSelect: 'none' }}>
+              <div key={msg.id} style={{ alignSelf: 'center', margin: '4px 0', padding: '4px 12px', borderRadius: '14px', background: '#fff0f3', border: '1px solid #000', color: '#000', fontSize: '11px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', userSelect: 'none', position: 'relative', zIndex: 1 }}>
                 <span style={{ fontSize: '11px' }}>🎨</span>
-                <span style={{ color: '#64748b', fontWeight: '600' }}>@{msg.sender}</span>
+                <span style={{ color: '#000', fontWeight: '700' }}>@{msg.sender}</span>
                 <span>{msg.text}</span>
               </div>
             );
@@ -209,32 +250,31 @@ export default function ChatView({
           const isInviteCard = msg.isVoiceInvite || msg.isVideoInvite || msg.type === 'voice_invite' || msg.type === 'video_invite';
           const isCardActive = msg.type === 'video_invite' ? isVideoCallOpen : isVoiceConnected;
           return (
-            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: isInviteCard ? 'center' : msg.isUser ? 'flex-end' : 'flex-start', maxWidth: isInviteCard ? '95%' : '85%', width: isInviteCard ? '95%' : 'auto' }}>
+            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: isInviteCard ? 'center' : msg.isUser ? 'flex-end' : 'flex-start', maxWidth: isInviteCard ? '95%' : '85%', width: isInviteCard ? '95%' : 'auto', position: 'relative', zIndex: 1 }}>
               {!isMiniMode && !isInviteCard && (
-                <span style={{ fontSize: '10px', fontWeight: '600', marginBottom: '3px', color: msg.isAi ? '#818cf8' : msg.isUser ? '#94a3b8' : '#64748b', textAlign: msg.isUser ? 'right' : 'left', paddingLeft: msg.isUser ? 0 : '4px', paddingRight: msg.isUser ? '4px' : 0 }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', marginBottom: '3px', color: msg.isAi ? '#2563eb' : '#444', textAlign: msg.isUser ? 'right' : 'left', paddingLeft: msg.isUser ? 0 : '4px', paddingRight: msg.isUser ? '4px' : 0 }}>
                   {msg.isAi ? '🤖 @ai' : msg.sender} · {msg.time}
                 </span>
               )}
               {isInviteCard ? (
-                <div style={{ background: isCardActive ? (msg.type === 'video_invite' ? 'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(30,41,59,0.8))' : 'linear-gradient(135deg,rgba(34,197,94,0.12),rgba(30,41,59,0.8))') : 'rgba(30,41,59,0.6)', border: isCardActive ? (msg.type === 'video_invite' ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(34,197,94,0.4)') : '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', opacity: isCardActive ? 1 : 0.8 }}>
+                <div style={{ background: isCardActive ? '#9de3fe' : '#ffffff', border: '2px solid #000', borderRadius: '12px', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', boxShadow: '0 3px 0 #000' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: isCardActive ? (msg.type === 'video_invite' ? 'rgba(99,102,241,0.2)' : 'rgba(34,197,94,0.15)') : 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {msg.type === 'video_invite' ? <Video size={15} color={isCardActive ? '#6366f1' : '#64748b'} /> : <PhoneCall size={15} color={isCardActive ? '#22c55e' : '#64748b'} />}
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1.5px solid #000', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {msg.type === 'video_invite' ? <Video size={15} color="#000" /> : <PhoneCall size={15} color="#000" />}
                     </div>
                     <div>
-                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#f1f5f9' }}>{msg.text}</div>
-                      <div style={{ fontSize: '10px', color: isCardActive ? '#4ade80' : '#64748b' }}>
+                      <div style={{ fontSize: '12px', fontWeight: '800', color: '#000' }}>{msg.text}</div>
+                      <div style={{ fontSize: '10px', color: '#333' }}>
                         {msg.type === 'video_invite' ? (isCardActive ? 'Görüntülü arama odası açık' : 'Görüntülü arama sona erdi') : (isCardActive ? 'Sesli konuşma odası açık' : 'Sesli arama sona erdi')}
                       </div>
                     </div>
                   </div>
                   {isCardActive ? (
-                    <span style={{ background: msg.type === 'video_invite' ? 'rgba(99,102,241,0.15)' : 'rgba(34,197,94,0.15)', border: msg.type === 'video_invite' ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(34,197,94,0.4)', borderRadius: '8px', color: msg.type === 'video_invite' ? '#818cf8' : '#4ade80', padding: '4px 8px', fontSize: '10px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {msg.type === 'video_invite' ? <Video size={11} /> : <PhoneCall size={11} />} Aramaya Katıldın ✓
+                    <span style={{ background: '#bbf7d0', border: '1.5px solid #000', borderRadius: '8px', color: '#000', padding: '4px 8px', fontSize: '10px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {msg.type === 'video_invite' ? <Video size={11} /> : <PhoneCall size={11} />} Katıldın ✓
                     </span>
                   ) : (
-                    <button onClick={msg.type === 'video_invite' ? onJoinVideoCall : onJoinVoiceCall} style={{ background: msg.type === 'video_invite' ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'linear-gradient(135deg,#22c55e,#16a34a)', border: 'none', borderRadius: '8px', color: '#fff', padding: '5px 10px', fontSize: '11px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {msg.type === 'video_invite' ? <Video size={12} /> : <PhoneCall size={12} />}
+                    <button onClick={msg.type === 'video_invite' ? onJoinVideoCall : onJoinVoiceCall} className="chiclet-btn-primary" style={{ padding: '5px 12px', fontSize: '11px', fontWeight: '700' }}>
                       {msg.type === 'video_invite' ? 'Görüntülüye Katıl' : 'Sese Katıl'}
                     </button>
                   )}
@@ -242,13 +282,27 @@ export default function ChatView({
               ) : msg.type === 'sticker' ? (
                 <div style={{ fontSize: '40px', lineHeight: 1, textAlign: msg.isUser ? 'right' : 'left' }}>{msg.stickerData?.emoji}</div>
               ) : (
-                <div style={{ background: msg.isUser ? (currentTheme?.userBubbleBg || 'linear-gradient(135deg,#6366f1,#8b5cf6)') : (currentTheme?.aiBubbleBg || 'rgba(30, 41, 59, 0.95)'), color: '#f1f5f9', borderRadius: '12px', padding: isMiniMode ? '5px 8px' : '7px 11px', fontSize: '13px', lineHeight: '1.45', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.text}</div>
+                <div style={{
+                  background: msg.isUser ? (currentTheme?.userBubbleBg || '#9de3fe') : (currentTheme?.aiBubbleBg || '#ffffff'),
+                  color: '#000000',
+                  fontWeight: '600',
+                  border: '2px solid #000000',
+                  borderRadius: '12px',
+                  padding: isMiniMode ? '5px 8px' : '7px 12px',
+                  fontSize: '13px',
+                  lineHeight: '1.4',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  boxShadow: '0 2px 0 rgba(0,0,0,0.1)'
+                }}>
+                  {msg.text}
+                </div>
               )}
             </div>
           );
         })}
         {isAiTyping && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#818cf8', fontSize: '11px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ab0e0', fontSize: '11px' }}>
             <Bot size={12} /><span>@ai yazıyor...</span>
           </div>
         )}
@@ -256,15 +310,15 @@ export default function ChatView({
       </div>
 
       {showEmojiPanel && (
-        <div ref={emojiPanelRef} style={{ position: 'absolute', bottom: isMiniMode ? '38px' : '52px', left: '6px', right: isMiniMode ? '6px' : 'auto', width: isMiniMode ? 'auto' : '280px', maxHeight: isMiniMode ? '145px' : 'min(310px,calc(100% - 65px))', background: 'rgba(13,17,28,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: isMiniMode ? '6px 8px' : '10px', zIndex: 60, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.06)', padding: isMiniMode ? '3px 6px' : '5px 8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <Search size={isMiniMode ? 10 : 12} color="#64748b" />
-            <input type="text" value={emojiSearch} onChange={(e) => setEmojiSearch(e.target.value)} placeholder="Emoji ara..." style={{ background: 'transparent', border: 'none', color: '#f1f5f9', fontSize: isMiniMode ? '10px' : '11px', outline: 'none', width: '100%', fontFamily: 'inherit' }} />
+        <div ref={emojiPanelRef} style={{ position: 'absolute', bottom: isMiniMode ? '48px' : '60px', left: '8px', right: isMiniMode ? '8px' : 'auto', width: isMiniMode ? 'auto' : '280px', maxHeight: isMiniMode ? '145px' : 'min(310px,calc(100% - 75px))', background: '#fff0f3', border: '2px solid #000', borderRadius: '14px', padding: isMiniMode ? '6px 8px' : '10px', zIndex: 60, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#ffffff', padding: isMiniMode ? '3px 6px' : '5px 8px', borderRadius: '8px', border: '1.5px solid #000' }}>
+            <Search size={isMiniMode ? 10 : 12} color="#000" />
+            <input type="text" value={emojiSearch} onChange={(e) => setEmojiSearch(e.target.value)} placeholder="Emoji ara..." style={{ background: 'transparent', border: 'none', color: '#000', fontSize: isMiniMode ? '10px' : '11px', fontWeight: '600', outline: 'none', width: '100%', fontFamily: 'inherit' }} />
           </div>
           {!emojiSearch && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: isMiniMode ? '3px' : '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1.5px solid #000', paddingBottom: isMiniMode ? '3px' : '6px' }}>
               {EMOJI_CATEGORIES.map(cat => (
-                <button key={cat.id} onClick={() => setActiveEmojiTab(cat.id)} title={cat.name} style={{ background: activeEmojiTab === cat.id ? 'rgba(255,255,255,0.12)' : 'transparent', border: 'none', borderRadius: '6px', padding: isMiniMode ? '2px 4px' : '3px 5px', fontSize: isMiniMode ? '13px' : '15px', cursor: 'pointer' }}>
+                <button key={cat.id} onClick={() => setActiveEmojiTab(cat.id)} title={cat.name} style={{ background: activeEmojiTab === cat.id ? '#fecdd6' : 'transparent', border: activeEmojiTab === cat.id ? '1px solid #000' : 'none', borderRadius: '6px', padding: isMiniMode ? '2px 4px' : '3px 5px', fontSize: isMiniMode ? '13px' : '15px', cursor: 'pointer' }}>
                   {cat.icon}
                 </button>
               ))}
@@ -273,7 +327,7 @@ export default function ChatView({
           <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: isMiniMode ? 'repeat(6,1fr)' : 'repeat(7,1fr)', gap: '3px', maxHeight: isMiniMode ? '85px' : '190px' }}>
             {displayedEmojis.map((emoji, idx) => (
               <button key={idx} onClick={() => handleEmojiClick(emoji)} style={{ background: 'transparent', border: 'none', fontSize: isMiniMode ? '16px' : '19px', cursor: 'pointer', padding: isMiniMode ? '2px' : '3px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#fecdd6'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >{emoji}</button>
             ))}
@@ -282,32 +336,79 @@ export default function ChatView({
       )}
 
       {showStickerPanel && (
-        <div ref={stickerPanelRef} style={{ position: 'absolute', bottom: isMiniMode ? '38px' : '52px', left: isMiniMode ? '6px' : '40px', right: isMiniMode ? '6px' : 'auto', width: isMiniMode ? 'auto' : '190px', maxHeight: isMiniMode ? '135px' : '220px', background: 'rgba(13,17,28,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: isMiniMode ? '6px 8px' : '10px', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', overflowY: 'auto' }}>
-          <div style={{ fontSize: '9px', color: '#64748b', marginBottom: '5px', fontWeight: '600', textTransform: 'uppercase' }}>Çıkartmalar</div>
+        <div ref={stickerPanelRef} style={{ position: 'absolute', bottom: isMiniMode ? '48px' : '60px', left: isMiniMode ? '8px' : '40px', right: isMiniMode ? '8px' : 'auto', width: isMiniMode ? 'auto' : '200px', maxHeight: isMiniMode ? '135px' : '220px', background: '#fff0f3', border: '2px solid #000', borderRadius: '14px', padding: isMiniMode ? '6px 8px' : '10px', zIndex: 50, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', overflowY: 'auto' }}>
+          <div style={{ fontSize: '10px', color: '#000', marginBottom: '6px', fontWeight: '800', textTransform: 'uppercase' }}>Çıkartmalar</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {DEFAULT_STICKERS.map(s => (
-              <button key={s.id} onClick={() => sendMessage(s.emoji, 'sticker', { emoji: s.emoji, label: s.label })} title={s.label} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: isMiniMode ? '3px' : '5px', cursor: 'pointer', fontSize: isMiniMode ? '18px' : '22px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+              <button key={s.id} onClick={() => sendMessage(s.emoji, 'sticker', { emoji: s.emoji, label: s.label })} title={s.label} style={{ background: '#ffffff', border: '1.5px solid #000', borderRadius: '8px', padding: isMiniMode ? '3px' : '5px', cursor: 'pointer', fontSize: isMiniMode ? '18px' : '22px' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#fecdd6'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; }}
               >{s.emoji}</button>
             ))}
           </div>
         </div>
       )}
 
-      <div style={{ padding: isMiniMode ? '4px 6px' : '8px 10px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-        <button ref={emojiBtnRef} onClick={() => { setShowEmojiPanel(!showEmojiPanel); setShowStickerPanel(false); }} title="Emojiler" style={{ background: showEmojiPanel ? 'rgba(255,255,255,0.12)' : 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '3px', borderRadius: '6px', fontSize: isMiniMode ? '13px' : '15px', flexShrink: 0 }}>
+      <div style={{
+        margin: isMiniMode ? '2px 4px 4px 4px' : '0 10px 8px 10px',
+        padding: '5px 7px',
+        background: '#FFD2D3',
+        border: '1px solid #000',
+        boxShadow: '2px 4px 4px 1px rgba(0,0,0,0.40)',
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        flexShrink: 0
+      }}>
+        <button
+          ref={emojiBtnRef}
+          onClick={() => { setShowEmojiPanel(!showEmojiPanel); setShowStickerPanel(false); }}
+          title="Emojiler"
+          style={{ width: 26, height: 26, background: '#FCEDF1', border: '1px black solid', boxShadow: '1px 1px 4px rgba(0,0,0,0.25)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, padding: 0, transition: 'transform 0.1s ease, box-shadow 0.1s ease' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.25)'; }}
+          onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; e.currentTarget.style.boxShadow = '0px 0px 2px rgba(0,0,0,0.15)'; }}
+          onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+        >
           😄
         </button>
-        <button ref={stickerBtnRef} onClick={() => { setShowStickerPanel(!showStickerPanel); setShowEmojiPanel(false); }} title="Çıkartma" style={{ background: showStickerPanel ? 'rgba(255,255,255,0.12)' : 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '3px', borderRadius: '6px', flexShrink: 0 }}>
-          <Sticker size={isMiniMode ? 13 : 15} />
+        <button
+          ref={stickerBtnRef}
+          onClick={() => { setShowStickerPanel(!showStickerPanel); setShowEmojiPanel(false); }}
+          title="Çıkartma"
+          style={{ width: 26, height: 26, background: '#FCEDF1', border: '1px black solid', boxShadow: '1px 1px 4px rgba(0,0,0,0.25)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, transition: 'transform 0.1s ease, box-shadow 0.1s ease' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.25)'; }}
+          onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; e.currentTarget.style.boxShadow = '0px 0px 2px rgba(0,0,0,0.15)'; }}
+          onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+        >
+          <Sticker size={14} color="#000" />
         </button>
-        <input ref={inputRef} type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputText)} placeholder={isMiniMode ? 'Mesaj...' : 'Mesaj yaz veya / bas...'} style={{ flex: 1, padding: isMiniMode ? '6px 9px' : '7px 11px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: '#f1f5f9', fontSize: '13px', outline: 'none', minWidth: 0, fontFamily: 'inherit' }}
-          onFocus={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
-          onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputText)}
+          placeholder="Mesaj yaz veya / bas"
+          style={{
+            flex: 1, height: 29, padding: '0 10px',
+            background: '#FCEDF1', border: 'none', borderRadius: 8,
+            color: 'rgba(0,0,0,0.70)', fontSize: 12, fontFamily: 'Poppins', fontWeight: '500',
+            outline: 'none', minWidth: 0
+          }}
         />
-        <button onClick={() => sendMessage(inputText)} style={inputText.trim() ? { background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '10px', color: '#fff', padding: isMiniMode ? '6px 8px' : '7px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } : { background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: '#475569', borderRadius: '10px', padding: isMiniMode ? '6px 8px' : '7px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Send size={13} />
+        <button
+          onClick={() => sendMessage(inputText)}
+          title="Gönder"
+          style={{ width: 26, height: 26, background: '#A2E5FF', border: '1px black solid', boxShadow: '1px 1px 4px rgba(0,0,0,0.25)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, transition: 'transform 0.1s ease, box-shadow 0.1s ease' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '1px 1px 4px rgba(0,0,0,0.25)'; }}
+          onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px) scale(0.96)'; e.currentTarget.style.boxShadow = '0px 0px 2px rgba(0,0,0,0.15)'; }}
+          onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '1px 3px 6px rgba(0,0,0,0.20)'; }}
+        >
+          <Send size={14} color="#000" />
         </button>
       </div>
 

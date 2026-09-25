@@ -41,7 +41,7 @@ export default function FloatingVideoTile({
 
   const accentColor = currentTheme?.accentColor || '#6366f1';
 
-  // Gerçek WebCam & P2P Karşı Taraf Akışı
+  //WebCam & P2P 
   useEffect(() => {
     if (participant.stream && videoRef.current) {
       if (videoRef.current.srcObject !== participant.stream) {
@@ -68,12 +68,12 @@ export default function FloatingVideoTile({
     }
   }, [isSelf, participant.isCamOn, participant.stream]);
 
-  // Sürükleme Mantığı (Ayrılmış modda) — global drag flag ile mouseup kaybolmasın
+  // global drag flag 
   const onTileMouseDown = useCallback((e) => {
     if (!isDetached || e.target.closest('button') || e.target.closest('input')) return;
     e.preventDefault();
     dragging.current = true;
-    window.__startDrag?.(); // setIgnoreMouseEvents'in mouseup'ı kesmesini önle
+    window.__startDrag?.(); 
     const rect = tileRef.current.getBoundingClientRect();
     dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
@@ -117,31 +117,27 @@ export default function FloatingVideoTile({
         width: isDetached ? `${size.w}px` : '100%',
         height: isDetached ? `${size.h}px` : '165px',
         minHeight: '150px',
-        background: 'rgba(255, 255, 255, 0.04)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        background: '#f6d5df',
         borderRadius: '14px',
-        border: participant.isSpeaking ? `2px solid #22c55e` : `1px solid rgba(255,255,255,0.15)`,
-        boxShadow: participant.isSpeaking
-          ? '0 0 20px rgba(34,197,94,0.4), 0 8px 24px rgba(0,0,0,0.3)'
-          : '0 6px 20px rgba(0,0,0,0.25)',
+        border: participant.isSpeaking ? '2.5px solid #22c55e' : '2px solid #000000',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         zIndex: isDetached ? 9999 : 10,
         cursor: isDetached ? 'grab' : 'default',
         pointerEvents: 'auto',
-        transition: 'border 0.2s, box-shadow 0.2s',
+        transition: 'border 0.2s',
         flexShrink: 0
       }}
     >
-      {/* KAMERA GÖRÜNTÜSÜ & İÇ KATMANLAR (TAMAMEN ŞEFFAF CAM) */}
+      {}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: 'transparent'
       }}>
-        {/* Canlı Video / Avatar */}
+        {/* Live Video / Avatar */}
         {participant.isCamOn ? (
           (isSelf || participant.stream) ? (
             <video
@@ -184,7 +180,7 @@ export default function FloatingVideoTile({
           </div>
         )}
 
-        {/* 1. İÇ SOL TARAF: EKRANIN İÇİNDE SÜZÜLEN ÇIKARTMALAR */}
+        {}
         <div style={{
           position: 'absolute',
           top: '32px',
@@ -214,7 +210,7 @@ export default function FloatingVideoTile({
           ))}
         </div>
 
-        {/* 2. İÇ SAĞ/ÜST TARAF: KAFADAN ÇIKAN SALLANARAK SÜZÜLEN ŞEFFAF KONUŞMA BALONCUKLARI */}
+        {}
         <div style={{
           position: 'absolute',
           top: '24px',
@@ -259,7 +255,7 @@ export default function FloatingVideoTile({
           ))}
         </div>
 
-        {/* ÜST BİLGİ VE FİLTRE BUTONU */}
+        {}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
           padding: '5px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -311,7 +307,7 @@ export default function FloatingVideoTile({
           </div>
         </div>
 
-        {/* EFEKT SEÇİM AÇILIR MENÜSÜ */}
+        {}
         {isFilterMenuOpen && (
           <div style={{
             position: 'absolute', top: '28px', right: '8px', zIndex: 40,
@@ -338,58 +334,68 @@ export default function FloatingVideoTile({
         )}
       </div>
 
-      {/* ALT HIZLI MESAJ & ÇIKARTMA FIRLATMA ÇUBUĞU (ŞEFFAF) */}
+      {}
       <div style={{
         padding: '4px 6px',
-        background: 'rgba(0,0,0,0.25)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: '#fecdd6',
+        borderTop: '2px solid #000000',
         display: 'flex',
         alignItems: 'center',
-        gap: '3px'
+        gap: '4px'
       }}>
-        {/* Çıkartma Butonları */}
         <button
           onClick={() => onSendSticker(participant.id, '🔥')}
           title="🔥 Alev Fırlat"
-          style={{ background: 'transparent', border: 'none', fontSize: '12px', cursor: 'pointer', padding: '1px' }}
+          style={{ background: 'transparent', border: 'none', fontSize: '13px', cursor: 'pointer', padding: '1px' }}
         >
           🔥
         </button>
         <button
           onClick={() => onSendSticker(participant.id, '❤️')}
           title="❤️ Kalp Fırlat"
-          style={{ background: 'transparent', border: 'none', fontSize: '12px', cursor: 'pointer', padding: '1px' }}
+          style={{ background: 'transparent', border: 'none', fontSize: '13px', cursor: 'pointer', padding: '1px' }}
         >
           ❤️
         </button>
         <button
           onClick={() => onSendSticker(participant.id, '🎮')}
           title="🎮 Oyun İkonu Fırlat"
-          style={{ background: 'transparent', border: 'none', fontSize: '12px', cursor: 'pointer', padding: '1px' }}
+          style={{ background: 'transparent', border: 'none', fontSize: '13px', cursor: 'pointer', padding: '1px' }}
         >
           🎮
         </button>
 
-        {/* Mesaj Yazma */}
-        <form onSubmit={handleSendSpeech} style={{ flex: 1, display: 'flex', gap: '2px' }}>
+        <form onSubmit={handleSendSpeech} style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          background: '#fff0f3',
+          border: '1.5px solid #000000',
+          borderRadius: '10px',
+          padding: '2px 4px',
+          gap: '4px'
+        }}>
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Baloncuğa yaz..."
             style={{
-              flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '5px', padding: '2px 5px', color: '#fff', fontSize: '9.5px', outline: 'none'
+              flex: 1, background: 'transparent', border: 'none',
+              color: '#000000', fontSize: '10px', fontWeight: '600', outline: 'none', minWidth: 0
             }}
           />
           <button
             type="submit"
             style={{
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none',
-              color: '#fff', borderRadius: '5px', padding: '2px 5px', cursor: 'pointer', display: 'flex', alignItems: 'center'
+              width: '20px', height: '20px',
+              borderRadius: '6px',
+              background: '#9de3fe', border: '1px solid #000000',
+              color: '#000000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 0
             }}
           >
-            <Send size={9} />
+            <Send size={10} color="#000" />
           </button>
         </form>
       </div>

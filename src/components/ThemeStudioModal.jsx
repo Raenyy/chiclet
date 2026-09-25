@@ -1,52 +1,85 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Palette, Sparkles, Trash2, X, Brush, Eraser, RotateCcw, Smile, Plus, Edit3, Download, Upload, Image as ImageIcon, Check } from 'lucide-react';
 import {
   PRESET_THEMES,
   getSavedCustomThemes,
   saveCustomTheme,
   deleteCustomTheme
 } from '../services/ThemeService';
-
+import { Upload, Download, Plus, ArrowLeft } from 'lucide-react';
+import chicletLogo from '../assets/ChicletLogoNew.jpg';
+import CizimIcon from '../assets/CizimIcon.png';
+import SilgiIcon from '../assets/SilgiIcon.png';
+import EmojiIcon from '../assets/EmojiIcon.png';
+import GeriAlIcon from '../assets/GeriAlIcon.png';
+import FotografEkleIcon from '../assets/FotografEkleIcon.png';
+import TemizleIcon from '../assets/TemizleIcon.png';
+import SohbetiGizleIcon from '../assets/SohbetiGizleIconpng.png';
 
 const STICKER_LIBRARY = [
   '🌸', '✨', '⚡', '👑', '🎮', '🐱', '🚀', '🍄',
   '👾', '☕', '💎', '🍕', '🫧', '🌈', '🧸', '🌙',
-  '🎨', '🍉', '🕹️', '🐸', '🦆', '🔥', '💀', '💜'
+  '🎨', '🍉', '🕹️', '🐸', '🦆', '🔥', '💀', '💜',
+  '🎀', '⭐', '🎈', '🍭', '🍓', '🍰', '🧁', '🍦'
 ];
 
-const PALETTE_COLORS = [
-  '#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6',
-  '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6',
-  '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b',
-  '#f97316', '#ef4444', '#78716c', '#cbd5e1', '#ffffff'
-];
+// İçi tamamen renkle dolu özel daire renk seçici
+function ColorPickerCircle({ value, onChange, size = 26, title }) {
+  const inputRef = useRef(null);
+  return (
+    <div
+      onClick={() => inputRef.current?.click()}
+      title={title}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: '50%',
+        backgroundColor: value,
+        border: '1.5px solid #000000',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        cursor: 'pointer',
+        position: 'relative',
+        flexShrink: 0,
+        transition: 'transform 0.1s ease',
+      }}
+      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.12)'}
+      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+    >
+      <input
+        ref={inputRef}
+        type="color"
+        value={value.startsWith('#') ? value : '#ffffff'}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          position: 'absolute',
+          opacity: 0,
+          width: 0,
+          height: 0,
+          pointerEvents: 'none'
+        }}
+      />
+    </div>
+  );
+}
 
-const CANVAS_BACKGROUNDS = [
-  { label: 'Koyu Gece', color: '#0d1117', rgb: '13, 17, 28' },
-  { label: 'Sıcak Kahve', color: '#1a120b', rgb: '26, 18, 11' },
-  { label: 'Pastel Mor', color: '#1b132a', rgb: '27, 19, 42' },
-  { label: 'Mat Antrasit', color: '#131720', rgb: '19, 23, 32' },
-  { label: 'Derin Orman', color: '#0a1a14', rgb: '10, 26, 20' }
-];
-
-export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose, initialView = 'quick' }) {
-  const [viewMode, setViewMode] = useState(initialView); // 'quick' | 'draw'
+export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose, initialView = 'draw' }) {
+  const [viewMode, setViewMode] = useState(initialView); // 'draw' | 'quick'
   const [savedThemes, setSavedThemes] = useState(getSavedCustomThemes());
   const [backupSuccessMsg, setBackupSuccessMsg] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   // Çizim & Renk Araçları
   const [activeTool, setActiveTool] = useState('brush'); // 'brush' | 'eraser' | 'sticker'
-  const [brushColor, setBrushColor] = useState('#a855f7');
-  const [brushSize, setBrushSize] = useState(6);
+  const [brushColor, setBrushColor] = useState('#000000');
+  const [bucketColor, setBucketColor] = useState('#ffffff');
+  const [brushSize, setBrushSize] = useState(5);
   const [selectedSticker, setSelectedSticker] = useState('✨');
-  const [canvasBg, setCanvasBg] = useState(CANVAS_BACKGROUNDS[0]);
   const [themeName, setThemeName] = useState('Yeni Çizimim');
   const [editingThemeId, setEditingThemeId] = useState(null);
 
-  // Özelleştirilebilir Mesaj Balonu Renkleri
-  const [userBubbleColor, setUserBubbleColor] = useState('#4f46e5');
-  const [userBubbleEndColor, setUserBubbleEndColor] = useState('#7c3aed');
-  const [aiBubbleColor, setAiBubbleColor] = useState('rgba(30, 41, 59, 0.95)');
+  // Mesaj Balonu Renkleri
+  const [userBubbleColor, setUserBubbleColor] = useState('#9de3fe');
+  const [userBubbleEndColor, setUserBubbleEndColor] = useState('#a2e5ff');
+  const [aiBubbleColor, setAiBubbleColor] = useState('#ffffff');
 
   const [showLivePreview, setShowLivePreview] = useState(true);
   const [stickersOnCanvas, setStickersOnCanvas] = useState([]);
@@ -62,7 +95,7 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     if (viewMode === 'draw' && canvasRef.current && !editingThemeId) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = canvasBg.color;
+      ctx.fillStyle = bucketColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       saveState();
     }
@@ -103,31 +136,30 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = canvasBg.color;
+    ctx.fillStyle = bucketColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setStickersOnCanvas([]);
     saveState([]);
   };
 
-  const changeCanvasBg = (bg) => {
-    setCanvasBg(bg);
+  const changeBucketColor = (color) => {
+    setBucketColor(color);
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = bg.color;
+    ctx.fillStyle = color;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     saveState(stickersOnCanvas);
   };
 
-  // Düzenleme modunu aç
   const handleStartEditTheme = (theme, e) => {
     e.stopPropagation();
     setEditingThemeId(theme.id);
     setThemeName(theme.name);
     if (theme.accentColor) setBrushColor(theme.accentColor);
-    if (theme.userBubbleBg) {
-      setUserBubbleColor(theme.accentColor || '#4f46e5');
-    }
+    if (theme.userBubbleBg) setUserBubbleColor(theme.userBubbleBg);
+    if (theme.userBubbleEnd) setUserBubbleEndColor(theme.userBubbleEnd);
+    if (theme.aiBubbleBg) setAiBubbleColor(theme.aiBubbleBg);
     setViewMode('draw');
 
     setTimeout(() => {
@@ -145,57 +177,59 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     }, 50);
   };
 
+  const getCanvasPos = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  };
+
   const startDrawing = (e) => {
     if (activeTool === 'sticker') {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const newSticker = {
+      const pos = getCanvasPos(e);
+      const newStk = {
         id: Date.now(),
         emoji: selectedSticker,
-        x: x - 16,
-        y: y - 16,
-        size: 32
+        x: pos.x - 14,
+        y: pos.y - 14
       };
-      const updated = [...stickersOnCanvas, newSticker];
+      const updated = [...stickersOnCanvas, newStk];
       setStickersOnCanvas(updated);
       saveState(updated);
       return;
     }
-
     isDrawing.current = true;
-    const rect = canvasRef.current.getBoundingClientRect();
-    lastPos.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
+    lastPos.current = getCanvasPos(e);
   };
 
   const draw = (e) => {
     if (!isDrawing.current || activeTool === 'sticker') return;
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
+    const curPos = getCanvasPos(e);
 
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
-    ctx.lineTo(currentX, currentY);
+    ctx.lineTo(curPos.x, curPos.y);
 
     if (activeTool === 'eraser') {
-      ctx.strokeStyle = canvasBg.color;
-      ctx.lineWidth = brushSize * 2.5;
+      ctx.strokeStyle = bucketColor;
+      ctx.lineWidth = brushSize * 3;
     } else {
       ctx.strokeStyle = brushColor;
       ctx.lineWidth = brushSize;
     }
-
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    lastPos.current = { x: currentX, y: currentY };
+    lastPos.current = curPos;
   };
 
   const stopDrawing = () => {
@@ -205,153 +239,43 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     }
   };
 
-  const generateWallpaperDataUrl = () => {
-    if (!canvasRef.current) return null;
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvasRef.current.width;
-    tempCanvas.height = canvasRef.current.height;
-    const tempCtx = tempCanvas.getContext('2d');
+  const handleSaveAndApplyWallpaper = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
 
-    tempCtx.drawImage(canvasRef.current, 0, 0);
-    tempCtx.font = '28px sans-serif';
-    tempCtx.textAlign = 'center';
-    tempCtx.textBaseline = 'middle';
     stickersOnCanvas.forEach(s => {
-      tempCtx.fillText(s.emoji, s.x + 16, s.y + 16);
+      ctx.font = '28px sans-serif';
+      ctx.fillText(s.emoji, s.x, s.y + 24);
     });
 
-    return tempCanvas.toDataURL('image/png');
-  };
-
-  const handleSaveAndApplyWallpaper = () => {
-    const wallpaperUrl = generateWallpaperDataUrl();
-    const finalUserBubble = `linear-gradient(135deg, ${userBubbleColor}, ${userBubbleEndColor})`;
-
+    const finalData = canvas.toDataURL('image/png');
     const newTheme = {
-      id: editingThemeId || `custom_art_${Date.now()}`,
-      name: themeName.trim() || 'Özel Sanat Temam',
-      isCustom: true,
-      bgGradient: `radial-gradient(ellipse at top, ${canvasBg.color} 0%, #000 100%)`,
-      windowRgb: canvasBg.rgb,
-      accentColor: userBubbleColor,
-      accentGradient: `linear-gradient(135deg, ${userBubbleColor}, ${userBubbleEndColor})`,
-      userBubbleBg: finalUserBubble,
+      id: editingThemeId || ('custom_' + Date.now()),
+      name: themeName.trim() || 'Özel Çizim',
+      accentColor: brushColor,
+      userBubbleBg: userBubbleColor,
+      userBubbleEnd: userBubbleEndColor,
       aiBubbleBg: aiBubbleColor,
-      textColor: '#f1f5f9',
-      borderColor: `${userBubbleColor}50`,
-      glowColor: `${userBubbleColor}40`,
-      customWallpaper: wallpaperUrl
+      customWallpaper: finalData,
+      isCustom: true
     };
-
     saveCustomTheme(newTheme);
     setSavedThemes(getSavedCustomThemes());
     onSelectTheme(newTheme);
-    setEditingThemeId(null);
-    setViewMode('quick');
+    onClose();
   };
 
-  const handleDelete = (id, e) => {
-    e.stopPropagation();
-    deleteCustomTheme(id);
-    setSavedThemes(getSavedCustomThemes());
-  };
-
-  // 💾 DOSYAYA YEDEKLE (TÜM TEMALAR)
-  const handleExportAllThemes = () => {
-    const themesToExport = getSavedCustomThemes();
-    if (themesToExport.length === 0) {
-      alert('Henüz kaydedilmiş özel bir temanız yok!');
-      return;
-    }
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themesToExport, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `chiclet-temalarim-yedek-${new Date().toISOString().slice(0,10)}.chiclet`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-
-    setBackupSuccessMsg('Temaların dosyaya kaydedildi!');
-    setTimeout(() => setBackupSuccessMsg(null), 3000);
-  };
-
-  // 💾 TEK BİR TEMAYI RESİM OLARAK İNDİR
-  const handleDownloadSingleTheme = (theme, e) => {
-    e.stopPropagation();
-    if (theme.customWallpaper) {
-      const link = document.createElement('a');
-      link.download = `${theme.name.replace(/\s+/g, '_')}_duvarkagidi.png`;
-      link.href = theme.customWallpaper;
-      link.click();
-    }
-  };
-
-  // 📥 DOSYADAN TEMA İÇE AKTAR (YEDEKTEN GERİ YÜKLE)
-  const handleImportFile = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    if (file.name.endsWith('.chiclet') || file.name.endsWith('.json')) {
-      reader.onload = (event) => {
-        try {
-          const imported = JSON.parse(event.target.result);
-          const list = Array.isArray(imported) ? imported : [imported];
-          list.forEach(t => {
-            if (t.name && t.customWallpaper) {
-              saveCustomTheme(t);
-            }
-          });
-          const updated = getSavedCustomThemes();
-          setSavedThemes(updated);
-          if (list[0]) onSelectTheme(list[0]);
-          setBackupSuccessMsg(`${list.length} adet tema başarıyla yüklendi!`);
-          setTimeout(() => setBackupSuccessMsg(null), 3500);
-        } catch (err) {
-          alert('Dosya okunurken bir hata oluştu! Geçerli bir .chiclet dosyası seçtiğinizden emin olun.');
-        }
-      };
-      reader.readAsText(file);
-    } else if (file.type.startsWith('image/')) {
-      reader.onload = (event) => {
-        const dataUrl = event.target.result;
-        const newTheme = {
-          id: `imported_img_${Date.now()}`,
-          name: file.name.replace(/\.[^/.]+$/, "") || 'Yüklenen Duvar Kağıdı',
-          isCustom: true,
-          bgGradient: `radial-gradient(ellipse at top, #0d1117 0%, #000 100%)`,
-          windowRgb: '13, 17, 28',
-          accentColor: '#6366f1',
-          accentGradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-          userBubbleBg: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-          aiBubbleBg: 'rgba(30, 41, 59, 0.95)',
-          textColor: '#f1f5f9',
-          borderColor: '#6366f150',
-          glowColor: '#6366f140',
-          customWallpaper: dataUrl
-        };
-        saveCustomTheme(newTheme);
-        setSavedThemes(getSavedCustomThemes());
-        onSelectTheme(newTheme);
-        setBackupSuccessMsg('Fotoğrafınız duvar kağıdı olarak eklendi!');
-        setTimeout(() => setBackupSuccessMsg(null), 3500);
-      };
-      reader.readAsDataURL(file);
-    }
-    e.target.value = '';
-  };
-
-  // 🖼️ TUVALE RESİM YÜKLE (ÇİZİM ESNASINDA)
   const handleLoadImageToCanvas = (e) => {
     const file = e.target.files?.[0];
-    if (!file || !canvasRef.current) return;
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new window.Image();
       img.src = event.target.result;
       img.onload = () => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         saveState();
@@ -361,10 +285,42 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     e.target.value = '';
   };
 
+  const handleExportAllThemes = () => {
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(savedThemes));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute('href', dataStr);
+    dlAnchor.setAttribute('download', `chiclet-temalar-${new Date().toISOString().slice(0,10)}.chiclet`);
+    dlAnchor.click();
+    setBackupSuccessMsg('Temalar başarıyla yedeklendi!');
+    setTimeout(() => setBackupSuccessMsg(null), 3000);
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(t => saveCustomTheme(t));
+          setSavedThemes(getSavedCustomThemes());
+          setBackupSuccessMsg(`${parsed.length} adet tema içe aktarıldı!`);
+          setTimeout(() => setBackupSuccessMsg(null), 3000);
+        }
+      } catch (_) {}
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   // ─── Sürüklenebilir Panel ────────────────────────────────────────────────────
+  const modalWidth = viewMode === 'draw' ? 710 : 620;
+  const modalHeight = viewMode === 'draw' ? 480 : 440;
+
   const [modalPos, setModalPos] = useState(() => ({
-    x: Math.round(window.innerWidth / 2 - (viewMode === 'draw' ? 370 : 270)),
-    y: Math.round(window.innerHeight / 2 - 300)
+    x: Math.round(window.innerWidth / 2 - modalWidth / 2),
+    y: Math.round(window.innerHeight / 2 - modalHeight / 2)
   }));
   const modalDragging = useRef(false);
   const modalDragOffset = useRef({ x: 0, y: 0 });
@@ -377,8 +333,8 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     const onMove = (ev) => {
       if (!modalDragging.current) return;
       setModalPos({
-        x: Math.max(0, Math.min(window.innerWidth - 100, ev.clientX - modalDragOffset.current.x)),
-        y: Math.max(0, Math.min(window.innerHeight - 60, ev.clientY - modalDragOffset.current.y))
+        x: Math.max(0, Math.min(window.innerWidth - modalWidth, ev.clientX - modalDragOffset.current.x)),
+        y: Math.max(0, Math.min(window.innerHeight - modalHeight, ev.clientY - modalDragOffset.current.y))
       });
     };
     const onUp = () => {
@@ -390,8 +346,16 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
     window.addEventListener('mouseup', onUp);
   };
 
+  // Buton Hover Efektleri
+  const hoverBtn = {
+    transition: 'transform 0.1s ease, box-shadow 0.1s ease',
+    cursor: 'pointer'
+  };
+  const onHoverUp = (e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2)'; };
+  const onHoverOut = (e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; };
+  const onMouseDownAnim = (e) => { e.currentTarget.style.transform = 'translateY(1px) scale(0.97)'; };
+
   return (
-    // Floating panel — tam ekran backdrop YOK, arkadaki her şey tıklanabilir
     <div
       data-chiclet="true"
       style={{
@@ -399,310 +363,164 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
         left: `${modalPos.x}px`,
         top: `${modalPos.y}px`,
         zIndex: 10000,
-        pointerEvents: 'auto',
+        pointerEvents: 'auto'
       }}
     >
-      {/* Gizli Dosya Seçiciler */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleImportFile}
-        accept=".chiclet,.json,image/*"
-        style={{ display: 'none' }}
-      />
-      <input
-        type="file"
-        ref={canvasImageInputRef}
-        onChange={handleLoadImageToCanvas}
-        accept="image/*"
-        style={{ display: 'none' }}
-      />
+      <input type="file" ref={fileInputRef} onChange={handleImportFile} accept=".chiclet,.json,image/*" style={{ display: 'none' }} />
+      <input type="file" ref={canvasImageInputRef} onChange={handleLoadImageToCanvas} accept="image/*" style={{ display: 'none' }} />
 
+      {/* Ana Çerçeve (Bembeyaz değil, Chiclet pembe/pastel gradyanı) */}
       <div style={{
-        width: viewMode === 'draw' ? '740px' : '540px',
-        maxHeight: '92vh',
-        background: 'rgba(15, 20, 32, 0.98)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '22px',
-        boxShadow: '0 25px 70px rgba(0,0,0,0.85), 0 0 35px rgba(99,102,241,0.2)',
+        width: modalWidth,
+        height: modalHeight,
+        position: 'relative',
+        background: 'linear-gradient(137deg, #FFF5F7 0%, #FEE8EE 100%)',
+        overflow: 'hidden',
+        borderRadius: 14,
+        boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+        border: '1.5px solid #000000',
+        userSelect: 'none',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
-        color: '#f1f5f9',
-        transition: 'width 0.25s ease'
+        transition: 'width 0.2s ease, height 0.2s ease'
       }}>
-        {/* Üst Bar */}
+
+        {/* Üst Titlebar */}
         <div
           onMouseDown={onModalHeaderMouseDown}
           style={{
-            padding: '12px 18px',
-            background: 'rgba(0,0,0,0.45)',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            height: 42,
+            margin: '8px 8px 0 8px',
+            background: '#F3A6BA',
+            boxShadow: '2px 4px 4px 1px rgba(0, 0, 0, 0.40)',
+            borderRadius: 8,
+            outline: '1px black solid',
+            cursor: 'grab',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            cursor: 'grab',
-            userSelect: 'none'
-          }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            padding: '0 10px',
+            flexShrink: 0
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{
-              width: '24px', height: '24px', borderRadius: '7px',
-              background: 'linear-gradient(135deg, #a855f7, #6366f1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
+              width: 27,
+              height: 27,
+              background: 'white',
+              borderRadius: 6,
+              outline: '1px black solid',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              <Palette size={13} color="#fff" />
+              <img style={{ width: 31, height: 31 }} src={chicletLogo} alt="Logo" draggable={false} />
             </div>
-            <span style={{ fontSize: '13px', fontWeight: '800' }}>
-              {viewMode === 'draw' ? (editingThemeId ? 'Duvar Kağıdını & Renkleri Düzenle' : 'Duvar Kağıdı Çizim & Renk Stüdyosu') : 'Tema & Duvar Kağıdı Seçici'}
+            <span style={{ color: 'black', fontSize: 14, fontFamily: 'Poppins', fontWeight: '700' }}>
+              {viewMode === 'draw' ? 'Yeni Duvar Kağıdı' : 'Duvar Kağıtlarım'}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {viewMode === 'draw' ? (
-              <button
-                onClick={() => { setEditingThemeId(null); setViewMode('quick'); }}
-                style={{
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#cbd5e1', borderRadius: '6px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer'
-                }}
-              >
-                ← Listeye Dön
-              </button>
-            ) : (
-              <button
-                onClick={() => { setEditingThemeId(null); setViewMode('draw'); }}
-                style={{
-                  background: 'rgba(168,85,247,0.18)', border: '1px solid #a855f7',
-                  color: '#c084fc', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: '600',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-                }}
-              >
-                <Plus size={12} /> Yeni Duvar Kağıdı Çiz
-              </button>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Liste / Çizim Geçiş Butonu — Başında Ok İkonu */}
+            <button
+              onClick={() => { setDeleteConfirmId(null); setViewMode(viewMode === 'draw' ? 'quick' : 'draw'); }}
+              title={viewMode === 'draw' ? 'Kayıtlı Duvar Kağıtları Listesi' : 'Çizim Ekranına Dön'}
+              style={{
+                background: 'linear-gradient(136deg, #FCEBEF 0%, #BDE2EF 100%)',
+                borderRadius: 8,
+                border: '1px black solid',
+                padding: '4px 12px',
+                fontSize: 12,
+                fontFamily: 'Poppins',
+                fontWeight: '700',
+                color: 'black',
+                boxShadow: '1px 1px 3px rgba(0,0,0,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                ...hoverBtn
+              }}
+              onMouseEnter={onHoverUp}
+              onMouseLeave={onHoverOut}
+              onMouseDown={onMouseDownAnim}
+            >
+              <ArrowLeft size={13} strokeWidth={2.5} />
+              <span>{viewMode === 'draw' ? 'Duvar Kağıtlarım' : 'Yeni Çizim'}</span>
+            </button>
 
+            {/* Kapat Butonu */}
             <button
               onClick={onClose}
               title="Kapat"
               style={{
-                background: 'rgba(255,255,255,0.06)', border: 'none',
-                color: '#94a3b8', borderRadius: '8px', padding: '6px',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                width: 26,
+                height: 26,
+                background: '#F19191',
+                boxShadow: '1px 1px 4px rgba(0, 0, 0, 0.30), 0px 1px 3px rgba(0, 0, 0, 0.25) inset',
+                borderRadius: 8,
+                border: '1px black solid',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 13,
+                fontWeight: '700',
+                color: '#1E1E1E',
+                padding: 0,
+                ...hoverBtn
               }}
+              onMouseEnter={onHoverUp}
+              onMouseLeave={onHoverOut}
+              onMouseDown={onMouseDownAnim}
             >
-              <X size={15} />
+              &#10005;
             </button>
           </div>
         </div>
 
-        {/* Başarı / Bilgi Bildirimi */}
-        {backupSuccessMsg && (
-          <div style={{
-            background: 'rgba(34, 197, 94, 0.18)', borderBottom: '1px solid rgba(34, 197, 94, 0.3)',
-            padding: '6px 14px', fontSize: '11px', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '6px',
-            animation: 'fadeIn 0.2s ease-out'
-          }}>
-            <Check size={12} />
-            <span>{backupSuccessMsg}</span>
-          </div>
-        )}
-
-        {/* 1. GÖRÜNÜM: TEK SEKMEDE ŞİPŞAK TEMA SEÇİCİ & YEDEKLEME */}
-        {viewMode === 'quick' && (
-          <div style={{ padding: '16px 18px', overflowY: 'auto', flex: 1, maxHeight: '68vh' }}>
-            
-            {/* ÜST ARAÇ ÇUBUĞU */}
-            <div style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '12px',
-              padding: '10px 14px',
-              marginBottom: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '800', color: '#f1f5f9' }}>
-                  🎨 Duvar Kağıtları ({savedThemes.length})
-                </span>
-                <span style={{ fontSize: '10px', color: '#94a3b8' }}>
-                  (Seçtiğinizde gruptaki herkese yansır)
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <button
-                  onClick={() => { setEditingThemeId(null); setViewMode('draw'); }}
-                  style={{
-                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                    border: 'none', color: '#fff', borderRadius: '6px',
-                    padding: '4px 10px', fontSize: '10.5px', fontWeight: '700',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px',
-                    boxShadow: '0 2px 8px rgba(99,102,241,0.35)'
-                  }}
-                >
-                  <Plus size={12} /> Yeni Çiz
-                </button>
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  title="Dosyadan veya Fotoğraftan Tema Yükle"
-                  style={{
-                    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-                    color: '#cbd5e1', borderRadius: '6px', padding: '4px 8px', fontSize: '10.5px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
-                  }}
-                >
-                  <Upload size={11} /> Yükle
-                </button>
-
-                <button
-                  onClick={handleExportAllThemes}
-                  title="Temaları .chiclet Dosyasına Kaydet"
-                  style={{
-                    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-                    color: '#cbd5e1', borderRadius: '6px', padding: '4px 8px', fontSize: '10.5px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
-                  }}
-                >
-                  <Download size={11} /> Yedekle
-                </button>
-              </div>
-            </div>
-
-            {/* Özel Çizilmiş Duvar Kağıtları Listesi */}
-            {savedThemes.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {savedThemes.map(theme => {
-                  const isSelected = currentTheme?.id === theme.id;
-                  return (
-                    <div
-                      key={theme.id}
-                      onClick={() => { onSelectTheme(theme); onClose(); }}
-                      style={{
-                        background: 'rgba(255,255,255,0.04)',
-                        border: isSelected ? `2px solid ${theme.accentColor}` : '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '12px',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        boxShadow: isSelected ? `0 0 16px ${theme.glowColor}` : 'none',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                        transition: 'all 0.15s'
-                      }}
-                    >
-                      {theme.customWallpaper && (
-                        <div style={{
-                          height: '60px', borderRadius: '8px',
-                          backgroundImage: `url(${theme.customWallpaper})`,
-                          backgroundSize: 'cover', backgroundPosition: 'center',
-                          border: '1px solid rgba(255,255,255,0.1)'
-                        }} />
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#f1f5f9' }}>
-                          {theme.name}
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          {isSelected && <span style={{ fontSize: '10px', color: '#4ade80', fontWeight: 'bold' }}>✓</span>}
-
-                          <button
-                            onClick={(e) => handleStartEditTheme(theme, e)}
-                            title="Duvar Kağıdını & Renkleri Düzenle"
-                            style={{
-                              background: 'rgba(168,85,247,0.2)', border: '1px solid #a855f7',
-                              color: '#c084fc', borderRadius: '4px', padding: '3px 5px', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', gap: '2px', fontSize: '10px'
-                            }}
-                          >
-                            <Edit3 size={11} /> Düzenle
-                          </button>
-
-                          <button
-                            onClick={(e) => handleDownloadSingleTheme(theme, e)}
-                            title="Resim Olarak İndir"
-                            style={{
-                              background: 'rgba(255,255,255,0.08)', border: 'none',
-                              color: '#cbd5e1', borderRadius: '4px', padding: '3px', cursor: 'pointer'
-                            }}
-                          >
-                            <Download size={11} />
-                          </button>
-
-                          <button
-                            onClick={(e) => handleDelete(theme.id, e)}
-                            title="Sil"
-                            style={{
-                              background: 'rgba(239,68,68,0.15)', border: 'none',
-                              color: '#f87171', borderRadius: '4px', padding: '3px', cursor: 'pointer'
-                            }}
-                          >
-                            <Trash2 size={11} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div style={{
-                padding: '30px 20px', textAlign: 'center',
-                background: 'rgba(255,255,255,0.02)', borderRadius: '12px',
-                border: '1px dashed rgba(255,255,255,0.1)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'
-              }}>
-                <Palette size={32} color="#6366f1" style={{ opacity: 0.7 }} />
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#f1f5f9' }}>
-                  Henüz özel bir duvar kağıdı oluşturmadın
-                </div>
-                <div style={{ fontSize: '11px', color: '#94a3b8', maxWidth: '280px', lineHeight: '1.5' }}>
-                  Kendi resmini çizebilir, çıkartmalar ekleyebilir veya bilgisayarından bir fotoğraf yükleyebilirsin.
-                </div>
-                <button
-                  onClick={() => { setEditingThemeId(null); setViewMode('draw'); }}
-                  style={{
-                    marginTop: '6px',
-                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                    border: 'none', color: '#fff', borderRadius: '8px',
-                    padding: '6px 14px', fontSize: '11px', fontWeight: '700',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px'
-                  }}
-                >
-                  <Plus size={13} /> İlk Duvar Kağıdını Çiz
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 2. GÖRÜNÜM: ÇİZİM & RENK ÖZELLEŞTİRME STÜDYOSU */}
+        {/* ─── 1. GÖRÜNÜM: ÇİZİM MODU (Normal Chat Oranları) ─── */}
         {viewMode === 'draw' && (
-          <div style={{ padding: '16px 18px', overflowY: 'auto', flex: 1, display: 'flex', gap: '16px' }}>
-            
-            {/* SOL: TUVAL & ÖNİZLEME */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            padding: '10px 14px',
+            gap: 14,
+            overflow: 'hidden'
+          }}>
+            {/* SOL ALAN: Normal Chat Boyutunda Çizim & Canlı Önizleme */}
+            <div style={{
+              width: 320,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              flexShrink: 0
+            }}>
+              {/* Tuval Container (Normal Chat Boyutu: 320x370) */}
               <div style={{
+                width: 320,
+                height: 370,
                 position: 'relative',
-                width: '320px',
-                height: '380px',
-                borderRadius: '16px',
+                background: bucketColor,
+                borderRadius: 12,
+                outline: '1.5px black solid',
                 overflow: 'hidden',
-                border: '1.5px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
-                cursor: activeTool === 'sticker' ? 'crosshair' : activeTool === 'eraser' ? 'cell' : 'crosshair'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
               }}>
                 <canvas
                   ref={canvasRef}
                   width={320}
-                  height={380}
+                  height={370}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
                   onMouseLeave={stopDrawing}
-                  style={{ display: 'block', width: '100%', height: '100%' }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    cursor: activeTool === 'sticker' ? 'crosshair' : activeTool === 'eraser' ? 'cell' : 'crosshair'
+                  }}
                 />
 
                 {stickersOnCanvas.map(s => (
@@ -711,271 +529,832 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
                     style={{
                       position: 'absolute', left: `${s.x}px`, top: `${s.y}px`,
                       fontSize: '28px', pointerEvents: 'none', userSelect: 'none',
-                      filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))'
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
                     }}
                   >
                     {s.emoji}
                   </div>
                 ))}
 
+                {/* Tuval İçi Canlı Önizleme */}
                 {showLivePreview && (
                   <div style={{
-                    position: 'absolute', inset: 0, pointerEvents: 'none',
-                    background: 'rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column',
-                    justifyContent: 'space-between', padding: '10px'
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '8px'
                   }}>
+                    {/* Üst Bar Önizlemesi */}
                     <div style={{
-                      background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)',
-                      padding: '4px 8px', borderRadius: '8px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'rgba(255,255,255,0.85)',
+                      borderRadius: 8,
+                      padding: '4px 8px',
+                      border: '1px solid rgba(0,0,0,0.15)'
                     }}>
-                      <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#fff' }}>Chiclet Sohbet</span>
-                      <span style={{ fontSize: '9px', color: userBubbleColor }}>@{themeName}</span>
+                      <span style={{ fontSize: 12, fontFamily: 'Poppins', fontWeight: '700', color: '#000' }}>
+                        Chiclet
+                      </span>
+                      <span style={{
+                        fontSize: 10,
+                        fontFamily: 'Poppins',
+                        fontWeight: '600',
+                        background: '#D9D9D9',
+                        border: '1px solid #000',
+                        borderRadius: 6,
+                        padding: '1px 6px',
+                        color: '#000'
+                      }}>
+                        {themeName || 'Yeni Çizimim'}
+                      </span>
                     </div>
 
                     {/* Canlı Mesaj Baloncukları */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 'auto', marginBottom: 8 }}>
                       <div style={{
                         alignSelf: 'flex-start',
                         background: aiBubbleColor,
-                        backdropFilter: 'blur(6px)',
-                        border: `1px solid ${userBubbleColor}40`,
-                        borderRadius: '8px', padding: '4px 8px', fontSize: '10px', color: '#cbd5e1'
+                        border: '1.5px solid #000',
+                        borderRadius: 10,
+                        padding: '5px 9px',
+                        fontSize: 11,
+                        fontFamily: 'Poppins',
+                        fontWeight: '600',
+                        color: '#000',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
                       }}>
-                        🤖 @ai: Mesaj renkleriniz harika görünüyor!
+                        🤖 @ai: Renkler ve çizimin harika görünüyor!
                       </div>
                       <div style={{
                         alignSelf: 'flex-end',
-                        background: `linear-gradient(135deg, ${userBubbleColor}, ${userBubbleEndColor})`,
-                        borderRadius: '8px', padding: '4px 8px', fontSize: '10px', color: '#fff',
-                        boxShadow: `0 2px 8px ${userBubbleColor}60`
+                        background: userBubbleColor,
+                        border: '1.5px solid #000',
+                        borderRadius: 10,
+                        padding: '5px 9px',
+                        fontSize: 11,
+                        fontFamily: 'Poppins',
+                        fontWeight: '600',
+                        color: '#000',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
                       }}>
-                        Kendi renk ve çizim kombinasyonum 🔥
+                        Kendi duvar kağıdım ve balon renklerim 🎀
                       </div>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '4px 8px', borderRadius: '8px', fontSize: '10px', color: '#64748b' }}>
-                      Mesaj yaz...
+                    {/* Tuval İçi Mesaj Yazma Alanı */}
+                    <div style={{
+                      height: 32,
+                      background: '#FFD2D3',
+                      border: '1px solid #000',
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '0 8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                      <div style={{
+                        flex: 1,
+                        height: 22,
+                        background: '#FCEDF1',
+                        borderRadius: 6,
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 8px',
+                        color: 'rgba(0,0,0,0.65)',
+                        fontSize: 11,
+                        fontFamily: 'Poppins',
+                        fontWeight: '500'
+                      }}>
+                        Mesaj yaz veya / bas
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Tuval Alt Araçları */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', gap: '5px' }}>
-                  <button onClick={handleUndo} title="Geri Al" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#cbd5e1', padding: '5px 8px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
-                    <RotateCcw size={12} /> Geri Al
-                  </button>
-
-                  <button
-                    onClick={() => canvasImageInputRef.current?.click()}
-                    title="Bilgisayardan Fotoğraf Yükle"
-                    style={{
-                      background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                      color: '#cbd5e1', padding: '5px 8px', borderRadius: '8px', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px'
-                    }}
-                  >
-                    <ImageIcon size={12} /> Fotoğraf Ekle
-                  </button>
-
-                  <button onClick={handleClear} title="Temizle" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', padding: '5px 8px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
-                    <Trash2 size={12} /> Temizle
-                  </button>
-                </div>
-
+              {/* Tuval Altında Sohbeti Gizle Butonu (Sağa Yaslı, Tek İkon) */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setShowLivePreview(!showLivePreview)}
+                  title="Önizleme Baloncuklarını Aç/Kapat"
                   style={{
-                    background: showLivePreview ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)',
-                    border: `1px solid ${showLivePreview ? '#a855f7' : 'rgba(255,255,255,0.1)'}`,
-                    color: showLivePreview ? '#c084fc' : '#94a3b8',
-                    padding: '5px 8px', borderRadius: '8px', cursor: 'pointer', fontSize: '11px'
+                    background: 'white',
+                    border: '1px solid #000',
+                    borderRadius: 8,
+                    padding: '3px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    color: '#000',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    ...hoverBtn
                   }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
                 >
-                  {showLivePreview ? '👁️ Sohbeti Gizle' : '👁️ Sohbeti Göster'}
+                  <img src={SohbetiGizleIcon} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                  <span>{showLivePreview ? 'Sohbeti gizle' : 'Sohbeti göster'}</span>
                 </button>
               </div>
             </div>
 
-            {/* SAĞ: ARAÇLAR & MESAJLAŞMA RENK AYARLARI */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {/* SAĞ ALAN: Ferah Kontrol Paneli */}
+            <div style={{
+              flex: 1,
+              background: 'linear-gradient(155deg, rgba(255, 217, 227, 0.70) 0%, rgba(183, 233, 255, 0.70) 100%)',
+              border: '1px solid #FFE8E8',
+              borderRadius: 14,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              boxSizing: 'border-box'
+            }}>
+              {/* Tema Adı */}
               <div>
-                <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '3px' }}>
-                  Tema Adı:
+                <label style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '700', color: '#000', display: 'block', marginBottom: 4 }}>
+                  Tema Adı
                 </label>
                 <input
                   type="text"
                   value={themeName}
-                  onChange={(e) => setThemeName(e.target.value)}
-                  placeholder="Örn: Yıldızlı Kolaj..."
+                  onChange={e => setThemeName(e.target.value)}
+                  placeholder="Tema Adı..."
                   style={{
-                    width: '100%', padding: '6px 10px', background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
-                    color: '#fff', fontSize: '12px', outline: 'none', boxSizing: 'border-box'
+                    width: '100%',
+                    height: 30,
+                    background: '#FCF2F5',
+                    border: '1px solid #000',
+                    borderRadius: 8,
+                    padding: '0 10px',
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    outline: 'none',
+                    boxSizing: 'border-box'
                   }}
                 />
               </div>
 
-              {/* MESAJ BALONU RENK AYARLARI */}
+              {/* Mesajlaşma Balonu Renkleri (Tam Renk Dolgulu Yuvarlaklar) */}
               <div style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '10px',
-                padding: '8px 10px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px'
+                background: 'rgba(255, 255, 255, 0.65)',
+                border: '1px solid rgba(0,0,0,0.1)',
+                borderRadius: 10,
+                padding: '8px 12px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
               }}>
-                <label style={{ fontSize: '11px', color: '#c084fc', fontWeight: '700' }}>
-                  💬 Mesajlaşma Balon Renkleri:
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '700', color: '#000', marginBottom: 6 }}>
+                  Mesajlaşma balonu renkleri
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginBottom: '3px' }}>Kullanıcı Balonu:</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <input type="color" value={userBubbleColor} onChange={(e) => setUserBubbleColor(e.target.value)} style={{ width: '22px', height: '22px', border: 'none', cursor: 'pointer', background: 'transparent' }} />
-                      <input type="color" value={userBubbleEndColor} onChange={(e) => setUserBubbleEndColor(e.target.value)} style={{ width: '22px', height: '22px', border: 'none', cursor: 'pointer', background: 'transparent' }} />
+                    <span style={{ fontSize: 10, fontFamily: 'Poppins', fontWeight: '600', color: '#333', display: 'block', marginBottom: 3 }}>
+                      Kullanıcı balonu:
+                    </span>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <ColorPickerCircle
+                        value={userBubbleColor}
+                        onChange={setUserBubbleColor}
+                        size={26}
+                        title="Kullanıcı Balonu Başlangıç Rengi"
+                      />
+                      <ColorPickerCircle
+                        value={userBubbleEndColor}
+                        onChange={setUserBubbleEndColor}
+                        size={26}
+                        title="Kullanıcı Balonu Bitiş Rengi"
+                      />
                     </div>
                   </div>
                   <div>
-                    <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginBottom: '3px' }}>@ai Balon Rengi:</span>
-                    <input type="color" value={aiBubbleColor.startsWith('#') ? aiBubbleColor : '#1e293b'} onChange={(e) => setAiBubbleColor(e.target.value)} style={{ width: '22px', height: '22px', border: 'none', cursor: 'pointer', background: 'transparent' }} />
+                    <span style={{ fontSize: 10, fontFamily: 'Poppins', fontWeight: '600', color: '#333', display: 'block', marginBottom: 3 }}>
+                      Ai Balonu:
+                    </span>
+                    <ColorPickerCircle
+                      value={aiBubbleColor}
+                      onChange={setAiBubbleColor}
+                      size={26}
+                      title="AI Balonu Rengi"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Araç Seçici: Fırça / Silgi / Çıkartma */}
+              {/* Çizim Aracı Başlığı & 1. Satır Butonlar (linear-gradient(66deg, white 0%, #FCEDF1 100%)) */}
               <div>
-                <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '4px' }}>
-                  Çizim Aracı:
-                </label>
-                <div style={{ display: 'flex', gap: '5px' }}>
+                <div style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '700', color: '#000', marginBottom: 5 }}>
+                  Çizim Aracı
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {/* Fırça */}
                   <button
                     onClick={() => setActiveTool('brush')}
                     style={{
-                      flex: 1, padding: '6px', borderRadius: '7px', cursor: 'pointer',
-                      background: activeTool === 'brush' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${activeTool === 'brush' ? '#a855f7' : 'rgba(255,255,255,0.08)'}`,
-                      color: activeTool === 'brush' ? '#c084fc' : '#94a3b8',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '11px', fontWeight: '600'
+                      flex: 1,
+                      height: 30,
+                      background: activeTool === 'brush' ? '#A2E5FF' : 'linear-gradient(66deg, white 0%, #FCEDF1 100%)',
+                      border: activeTool === 'brush' ? '1.5px solid #000' : '1px solid rgba(0,0,0,0.25)',
+                      boxShadow: activeTool === 'brush' ? '0 0 0 1px #A2E5FF, 0 2px 4px rgba(0,0,0,0.15)' : '0 2px 4px rgba(0,0,0,0.1)',
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 5,
+                      fontSize: 11,
+                      fontFamily: 'Poppins',
+                      fontWeight: '600',
+                      ...hoverBtn
                     }}
+                    onMouseEnter={onHoverUp}
+                    onMouseLeave={onHoverOut}
+                    onMouseDown={onMouseDownAnim}
                   >
-                    <Brush size={11} /> Fırça
+                    <img src={CizimIcon} alt="" style={{ width: 15, height: 15, objectFit: 'contain' }} />
+                    <span>Fırça</span>
                   </button>
+
+                  {/* Silgi */}
                   <button
                     onClick={() => setActiveTool('eraser')}
                     style={{
-                      flex: 1, padding: '6px', borderRadius: '7px', cursor: 'pointer',
-                      background: activeTool === 'eraser' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${activeTool === 'eraser' ? '#a855f7' : 'rgba(255,255,255,0.08)'}`,
-                      color: activeTool === 'eraser' ? '#c084fc' : '#94a3b8',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '11px', fontWeight: '600'
+                      flex: 1,
+                      height: 30,
+                      background: activeTool === 'eraser' ? '#A2E5FF' : 'linear-gradient(66deg, white 0%, #FCEDF1 100%)',
+                      border: activeTool === 'eraser' ? '1.5px solid #000' : '1px solid rgba(0,0,0,0.25)',
+                      boxShadow: activeTool === 'eraser' ? '0 0 0 1px #A2E5FF, 0 2px 4px rgba(0,0,0,0.15)' : '0 2px 4px rgba(0,0,0,0.1)',
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 5,
+                      fontSize: 11,
+                      fontFamily: 'Poppins',
+                      fontWeight: '600',
+                      ...hoverBtn
                     }}
+                    onMouseEnter={onHoverUp}
+                    onMouseLeave={onHoverOut}
+                    onMouseDown={onMouseDownAnim}
                   >
-                    <Eraser size={11} /> Silgi
+                    <img src={SilgiIcon} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                    <span>Silgi</span>
                   </button>
+
+                  {/* Çıkartma */}
                   <button
-                    onClick={() => setActiveTool('sticker')}
+                    onClick={() => setActiveTool(activeTool === 'sticker' ? 'brush' : 'sticker')}
                     style={{
-                      flex: 1, padding: '6px', borderRadius: '7px', cursor: 'pointer',
-                      background: activeTool === 'sticker' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${activeTool === 'sticker' ? '#a855f7' : 'rgba(255,255,255,0.08)'}`,
-                      color: activeTool === 'sticker' ? '#c084fc' : '#94a3b8',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '11px', fontWeight: '600'
+                      flex: 1,
+                      height: 30,
+                      background: activeTool === 'sticker' ? '#A2E5FF' : 'linear-gradient(66deg, white 0%, #FCEDF1 100%)',
+                      border: activeTool === 'sticker' ? '1.5px solid #000' : '1px solid rgba(0,0,0,0.25)',
+                      boxShadow: activeTool === 'sticker' ? '0 0 0 1px #A2E5FF, 0 2px 4px rgba(0,0,0,0.15)' : '0 2px 4px rgba(0,0,0,0.1)',
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 5,
+                      fontSize: 11,
+                      fontFamily: 'Poppins',
+                      fontWeight: '600',
+                      ...hoverBtn
                     }}
+                    onMouseEnter={onHoverUp}
+                    onMouseLeave={onHoverOut}
+                    onMouseDown={onMouseDownAnim}
                   >
-                    <Smile size={11} /> Çıkartma
+                    <img src={EmojiIcon} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                    <span>Çıkartma</span>
                   </button>
                 </div>
               </div>
 
-              {/* Çıkartma Seçimi */}
-              {activeTool === 'sticker' && (
-                <div>
-                  <label style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '4px' }}>
-                    Çıkartma Seç (Tuvale Tıkla):
-                  </label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', background: 'rgba(0,0,0,0.3)', padding: '6px', borderRadius: '8px' }}>
-                    {STICKER_LIBRARY.map(s => (
-                      <button
-                        key={s} onClick={() => setSelectedSticker(s)}
-                        style={{
-                          background: selectedSticker === s ? 'rgba(168,85,247,0.3)' : 'transparent',
-                          border: selectedSticker === s ? '1px solid #a855f7' : 'none',
-                          borderRadius: '5px', fontSize: '18px', padding: '3px', cursor: 'pointer'
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Fırça Seçimi */}
-              {activeTool !== 'sticker' && (
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <label style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '600' }}>Fırça Rengi:</label>
-                    <input type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} style={{ width: '20px', height: '20px', border: 'none', cursor: 'pointer', background: 'transparent' }} />
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                    {PALETTE_COLORS.map(c => (
-                      <button
-                        key={c} onClick={() => setBrushColor(c)}
-                        style={{
-                          width: '18px', height: '18px', borderRadius: '4px',
-                          background: c, border: brushColor === c ? '2px solid #fff' : '1px solid rgba(0,0,0,0.3)',
-                          cursor: 'pointer', transform: brushColor === c ? 'scale(1.15)' : 'scale(1)'
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div style={{ marginTop: '6px' }}>
-                    <label style={{ fontSize: '10px', color: '#94a3b8', display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                      <span>Fırça Kalınlığı:</span><span>{brushSize}px</span>
-                    </label>
-                    <input type="range" min="2" max="24" step="1" value={brushSize} onChange={(e) => setBrushSize(parseInt(e.target.value))} style={{ width: '100%', accentColor: '#a855f7', cursor: 'pointer' }} />
-                  </div>
-                </div>
-              )}
-
-              {/* Zemin Rengi */}
-              <div>
-                <label style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Zemin Rengi:</label>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  {CANVAS_BACKGROUNDS.map(bg => (
+              {/* Çıkartma Modu Açıkken: Geniş ve Ferah Çıkartma Seçici Paneli */}
+              {activeTool === 'sticker' ? (
+                <div style={{
+                  background: 'rgba(255,255,255,0.85)',
+                  border: '1.5px solid #000',
+                  borderRadius: 10,
+                  padding: 8,
+                  height: 100,
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 6,
+                  alignContent: 'flex-start',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+                }}>
+                  {STICKER_LIBRARY.map(s => (
                     <button
-                      key={bg.label} onClick={() => changeCanvasBg(bg)}
+                      key={s}
+                      onClick={() => setSelectedSticker(s)}
                       style={{
-                        flex: 1, padding: '4px 2px', borderRadius: '6px', background: bg.color,
-                        border: canvasBg.label === bg.label ? '1.5px solid #a855f7' : '1px solid rgba(255,255,255,0.1)',
-                        color: '#cbd5e1', fontSize: '9px', cursor: 'pointer'
+                        background: selectedSticker === s ? '#A2E5FF' : 'white',
+                        border: selectedSticker === s ? '1.5px solid #000' : '1px solid rgba(0,0,0,0.15)',
+                        borderRadius: 8,
+                        fontSize: 22,
+                        padding: '4px 6px',
+                        cursor: 'pointer',
+                        lineHeight: 1,
+                        transition: 'transform 0.1s ease',
                       }}
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                      {bg.label}
+                      {s}
                     </button>
                   ))}
                 </div>
+              ) : (
+                /* Fırça & Kova Modu Açıkken: Renkler ve Fırça Kalınlığı (Boyut Göstergeli) */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: 100, justifyContent: 'center' }}>
+                  {/* Fırça & Kova Renkleri */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '600', color: '#000' }}>
+                        Fırça rengi:
+                      </span>
+                      <ColorPickerCircle
+                        value={brushColor}
+                        onChange={setBrushColor}
+                        size={24}
+                        title="Fırça Rengi Seç"
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '600', color: '#000' }}>
+                        Kova rengi:
+                      </span>
+                      <ColorPickerCircle
+                        value={bucketColor}
+                        onChange={changeBucketColor}
+                        size={24}
+                        title="Arka Plan Dolgu Rengi Seç"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Fırça Kalınlığı Slider (Boyutu Açıkça Yazan Rozetli) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontFamily: 'Poppins', fontWeight: '600', color: '#000', whiteSpace: 'nowrap' }}>
+                      Fırça kalınlığı:
+                    </span>
+                    <input
+                      type="range"
+                      min="1"
+                      max="30"
+                      value={brushSize}
+                      onChange={e => setBrushSize(parseInt(e.target.value))}
+                      style={{ flex: 1, height: 6, accentColor: '#7FA5E2', cursor: 'pointer' }}
+                    />
+                    <span style={{
+                      fontSize: 11,
+                      fontFamily: 'Poppins',
+                      fontWeight: '700',
+                      background: '#fff',
+                      border: '1px solid #000',
+                      borderRadius: 6,
+                      padding: '1px 6px',
+                      color: '#000',
+                      minWidth: 32,
+                      textAlign: 'center'
+                    }}>
+                      {brushSize}px
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Ayırıcı Çizgi */}
+              <div style={{ width: '100%', height: 0, outline: '1px #94C8FF solid' }} />
+
+              {/* 2. Satır Araçlar: Geri al, Fotoğraf ekle, Temizle (linear-gradient(44deg, #FCEBEF 0%, #BDE2EF 100%)) */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                {/* Geri al */}
+                <button
+                  onClick={handleUndo}
+                  title="Son Çizimi Geri Al"
+                  style={{
+                    flex: 1,
+                    height: 30,
+                    background: 'linear-gradient(44deg, #FCEBEF 0%, #BDE2EF 100%)',
+                    border: '1px solid rgba(0,0,0,0.25)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <img src={GeriAlIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+                  <span>Geri al</span>
+                </button>
+
+                {/* Fotoğraf ekle */}
+                <button
+                  onClick={() => canvasImageInputRef.current?.click()}
+                  title="Bilgisayarından Fotoğraf Yükle"
+                  style={{
+                    flex: 1.3,
+                    height: 30,
+                    background: 'linear-gradient(44deg, #FCEBEF 0%, #BDE2EF 100%)',
+                    border: '1px solid rgba(0,0,0,0.25)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <img src={FotografEkleIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+                  <span>Fotoğraf</span>
+                </button>
+
+                {/* Temizle */}
+                <button
+                  onClick={handleClear}
+                  title="Tuvali Temizle"
+                  style={{
+                    flex: 1,
+                    height: 30,
+                    background: 'linear-gradient(44deg, #FCEBEF 0%, #BDE2EF 100%)',
+                    border: '1px solid rgba(0,0,0,0.25)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <img src={TemizleIcon} alt="" style={{ width: 13, height: 13, objectFit: 'contain' }} />
+                  <span>Temizle</span>
+                </button>
               </div>
 
-              {/* Kaydet Butonu */}
+              {/* Duvar Kağıdını Kaydet Butonu (Dışa Doğru Belirgin Gölge) */}
               <button
                 onClick={handleSaveAndApplyWallpaper}
+                title="Kaydet ve Uygula"
                 style={{
-                  marginTop: 'auto', padding: '10px',
-                  background: 'linear-gradient(135deg, #a855f7, #ec4899)',
-                  border: 'none', borderRadius: '10px', color: '#fff', fontSize: '12px', fontWeight: '700',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                  boxShadow: '0 4px 18px rgba(168,85,247,0.4)'
+                  width: '100%',
+                  height: 38,
+                  marginTop: 'auto',
+                  background: '#A2E5FF',
+                  boxShadow: '0 6px 16px rgba(162, 229, 255, 0.75), 0 2px 4px rgba(0, 0, 0, 0.18)',
+                  borderRadius: 12,
+                  border: '1.5px solid #000000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'black',
+                  fontSize: 13,
+                  fontFamily: 'Poppins',
+                  fontWeight: '700',
+                  letterSpacing: 0.2,
+                  ...hoverBtn
                 }}
+                onMouseEnter={onHoverUp}
+                onMouseLeave={onHoverOut}
+                onMouseDown={onMouseDownAnim}
               >
-                <Sparkles size={13} /> {editingThemeId ? 'Değişiklikleri Kaydet & Uygula' : 'Duvar Kağıdı & Renkleri Kaydet'}
+                Duvar Kağıdını Kaydet
               </button>
             </div>
+          </div>
+        )}
 
+        {/* ─── 2. GÖRÜNÜM: DUVAR KAĞITLARIM (2 Sütunlu Liste, Onaylı Silme, İkonlu Butonlar) ─── */}
+        {viewMode === 'quick' && (
+          <div style={{
+            flex: 1,
+            padding: '14px 18px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10
+          }}>
+            {/* Bildirim Mesajı */}
+            {backupSuccessMsg && (
+              <div style={{
+                background: 'rgba(34, 197, 94, 0.2)',
+                border: '1px solid #22c55e',
+                borderRadius: 8,
+                padding: '6px 12px',
+                fontSize: 12,
+                color: '#15803d',
+                fontWeight: '600'
+              }}>
+                ✓ {backupSuccessMsg}
+              </div>
+            )}
+
+            {/* Üst Araç Çubuğu */}
+            <div style={{
+              background: '#fff0f3',
+              border: '1.5px solid rgba(0,0,0,0.1)',
+              borderRadius: 14,
+              padding: '8px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 13, fontWeight: '800', color: '#000', fontFamily: 'Poppins' }}>
+                  Duvar Kağıtları ({savedThemes.length})
+                </span>
+                <span style={{ fontSize: 11, color: '#555', fontFamily: 'Poppins' }}>
+                  Seçtiğinde gruptaki herkese anında yansır
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: 6 }}>
+                {/* Yeni Çizim Butonu — Artı İkonuyla */}
+                <button
+                  onClick={() => { setEditingThemeId(null); setViewMode('draw'); }}
+                  style={{
+                    background: '#A2E5FF',
+                    border: '1.5px solid #000',
+                    borderRadius: 8,
+                    padding: '5px 12px',
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '700',
+                    color: '#000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                  <span>Yeni Çiz</span>
+                </button>
+
+                {/* Yükle Butonu — Upload İkonuyla */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Yedekten Tema İçe Aktar"
+                  style={{
+                    background: 'white',
+                    border: '1px solid rgba(0,0,0,0.2)',
+                    borderRadius: 8,
+                    padding: '5px 12px',
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    color: '#000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <Upload size={12} />
+                  <span>Yükle</span>
+                </button>
+
+                {/* Yedekle Butonu — Download İkonuyla */}
+                <button
+                  onClick={handleExportAllThemes}
+                  title="Temaları Bilgisayara Yedekle"
+                  style={{
+                    background: 'white',
+                    border: '1px solid rgba(0,0,0,0.2)',
+                    borderRadius: 8,
+                    padding: '5px 12px',
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: '600',
+                    color: '#000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    ...hoverBtn
+                  }}
+                  onMouseEnter={onHoverUp}
+                  onMouseLeave={onHoverOut}
+                  onMouseDown={onMouseDownAnim}
+                >
+                  <Download size={12} />
+                  <span>Yedekle</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Kayıtlı Temalar Listesi (Tek Satırda İki Kart, 2'den Fazlası Aşağı Kayar) */}
+            {savedThemes.length > 0 ? (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 12,
+                maxHeight: '300px',
+                overflowY: 'auto',
+                paddingRight: 4
+              }}>
+                {savedThemes.map(theme => {
+                  const isSelected = currentTheme?.id === theme.id;
+                  const isConfirmingDelete = deleteConfirmId === theme.id;
+
+                  return (
+                    <div
+                      key={theme.id}
+                      onClick={() => {
+                        if (isConfirmingDelete) return;
+                        onSelectTheme(theme);
+                        onClose();
+                      }}
+                      style={{
+                        background: '#f8b4c4',
+                        border: isSelected ? '2.5px solid #2563eb' : '2px solid #000000',
+                        borderRadius: 16,
+                        padding: 10,
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                        ...hoverBtn
+                      }}
+                      onMouseEnter={onHoverUp}
+                      onMouseLeave={onHoverOut}
+                    >
+                      {/* Önizleme Resmi */}
+                      <div style={{
+                        width: '100%',
+                        height: 90,
+                        borderRadius: 10,
+                        overflow: 'hidden',
+                        border: '1.5px solid #000',
+                        backgroundImage: theme.customWallpaper ? `url(${theme.customWallpaper})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundColor: theme.userBubbleBg || '#fff'
+                      }} />
+
+                      {/* Bilgi & Butonlar (Silme Onaylı) */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 26 }}>
+                        <span style={{ fontSize: 12, fontFamily: 'Poppins', fontWeight: '700', color: '#000' }}>
+                          {theme.name}
+                        </span>
+
+                        {isConfirmingDelete ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={e => e.stopPropagation()}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#b91c1c' }}>Silinsin mi?</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteCustomTheme(theme.id);
+                                setSavedThemes(getSavedCustomThemes());
+                                setDeleteConfirmId(null);
+                              }}
+                              style={{
+                                background: '#ef4444',
+                                color: 'white',
+                                border: '1px solid #000',
+                                borderRadius: 4,
+                                padding: '1px 6px',
+                                fontSize: 10,
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Evet
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirmId(null);
+                              }}
+                              style={{
+                                background: 'white',
+                                border: '1px solid #000',
+                                borderRadius: 4,
+                                padding: '1px 6px',
+                                fontSize: 10,
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              İptal
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            <button
+                              onClick={(e) => handleStartEditTheme(theme, e)}
+                              title="Düzenle"
+                              style={{
+                                background: '#FCEDF1',
+                                border: '1px solid #000',
+                                borderRadius: 6,
+                                padding: '2px 8px',
+                                fontSize: 11,
+                                fontWeight: '600',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              ✏️ Düzenle
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirmId(theme.id);
+                              }}
+                              title="Sil"
+                              style={{
+                                background: '#F19191',
+                                border: '1px solid #000',
+                                borderRadius: 6,
+                                padding: '2px 8px',
+                                fontSize: 11,
+                                fontWeight: '600',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              🗑️ Sil
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{
+                padding: '40px 20px',
+                textAlign: 'center',
+                background: '#fff0f3',
+                borderRadius: 14,
+                border: '1.5px dashed #000',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 10
+              }}>
+                <span style={{ fontSize: 32 }}>🎨</span>
+                <div style={{ fontSize: 14, fontWeight: '700', color: '#000', fontFamily: 'Poppins' }}>
+                  Henüz özel bir duvar kağıdı oluşturmadın
+                </div>
+                <button
+                  onClick={() => { setEditingThemeId(null); setViewMode('draw'); }}
+                  style={{
+                    background: '#A2E5FF',
+                    border: '1.5px solid #000',
+                    borderRadius: 10,
+                    padding: '6px 16px',
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  + İlk Duvar Kağıdını Çiz
+                </button>
+              </div>
+            )}
           </div>
         )}
 

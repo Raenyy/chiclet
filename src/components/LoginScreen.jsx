@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { MessageCircle, Settings, ArrowRight, Minus, X } from 'lucide-react';
+﻿import React, { useState, useRef, useCallback } from 'react';
+import ginghamBg from '../assets/gingham-bg.png';
+import chicletLogo from '../assets/ChicletLogoNew.jpg';
 
 let ipcRenderer = null;
 try { ipcRenderer = window.require('electron').ipcRenderer; } catch (_) {}
@@ -7,19 +8,16 @@ try { ipcRenderer = window.require('electron').ipcRenderer; } catch (_) {}
 export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, onMinimize }) {
   const [username, setUsername] = useState('');
   const [shake, setShake] = useState(false);
+  const [btnPressed, setBtnPressed] = useState(false);
 
   const [pos, setPos] = useState(() => ({
-    x: Math.round(window.innerWidth / 2 - 170),
+    x: Math.round(window.innerWidth / 2 - 205),
     y: Math.round(window.innerHeight / 2 - 250)
   }));
 
   const dragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const minimizeBtnRef = useRef(null);
-  const cardRef = useRef(null);
-
-  const accentColor = currentTheme?.accentColor || '#ef4444';
-  const glowColor = currentTheme?.glowColor || 'rgba(239, 68, 68, 0.4)';
 
   const handleLogin = () => {
     if (!username.trim()) {
@@ -27,7 +25,11 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
       setTimeout(() => setShake(false), 500);
       return;
     }
-    onLogin(username.trim());
+    setBtnPressed(true);
+    setTimeout(() => {
+      setBtnPressed(false);
+      onLogin(username.trim());
+    }, 200);
   };
 
   const handleClose = () => {
@@ -48,11 +50,10 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
     dragging.current = true;
     window.__startDrag?.();
     dragOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
-
     const onMove = (ev) => {
       if (!dragging.current) return;
       setPos({
-        x: Math.max(0, Math.min(window.innerWidth - 340, ev.clientX - dragOffset.current.x)),
+        x: Math.max(0, Math.min(window.innerWidth - 410, ev.clientX - dragOffset.current.x)),
         y: Math.max(0, Math.min(window.innerHeight - 60, ev.clientY - dragOffset.current.y))
       });
     };
@@ -67,169 +68,56 @@ export default function LoginScreen({ onLogin, onOpenThemeStudio, currentTheme, 
   }, [pos]);
 
   return (
-    // data-chiclet: mouse bu elemanın üzerindeyken tıklamalar Chiclet'e gelir
-    <div
-      data-chiclet="true"
-      style={{
-        position: 'fixed',
-        left: `${pos.x}px`,
-        top: `${pos.y}px`,
-        width: '340px',
-        pointerEvents: 'auto', // tıklanabilir
-        zIndex: 1000
-      }}
-    >
-      <div
-        ref={cardRef}
-        style={{
-          width: '340px',
-          background: 'rgba(10, 13, 22, 0.99)',
-          border: `1px solid rgba(255, 255, 255, 0.10)`,
-          borderRadius: '20px',
-          boxShadow: `0 25px 60px rgba(0,0,0,0.92), 0 0 30px ${glowColor}`,
-          overflow: 'hidden'
-        }}
-      >
-        {/* ÜST BAR — sürüklenebilir */}
-        <div
-          onMouseDown={onHeaderMouseDown}
-          style={{
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'rgba(0,0,0,0.3)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            cursor: 'grab',
-            userSelect: 'none'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '28px', height: '28px', borderRadius: '9px',
-              background: accentColor,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 0 12px ${glowColor}`
-            }}>
-              <MessageCircle size={16} color="#fff" fill="#fff" />
-            </div>
-            <span style={{ fontSize: '13px', fontWeight: '800', color: '#fff' }}>
-              Chiclet
-            </span>
+    <div data-chiclet="true" style={{ position: 'fixed', left: `${pos.x}px`, top: `${pos.y}px`, width: 410, height: 500, pointerEvents: 'auto', zIndex: 1000 }}>
+      <div style={{ width: 410, height: 500, position: 'relative', background: 'linear-gradient(151deg, #FDF0E4 0%, #F587A5 100%)', overflow: 'hidden', borderRadius: 14 }}>
+
+        {/* Gingham bg overlay */}
+        <img style={{ width: 420, height: 500, left: 0, top: 0, position: 'absolute', opacity: 0.25, border: '1px black solid', userSelect: 'none', pointerEvents: 'none' }} src={ginghamBg} alt="" draggable={false} />
+
+        {/* Titlebar */}
+        <div onMouseDown={onHeaderMouseDown} style={{ width: 391, height: 39, left: 10, top: 12, position: 'absolute', background: '#F3A6BA', boxShadow: '2px 4px 4px 1px rgba(0,0,0,0.40)', overflow: 'hidden', borderRadius: 8, outline: '1px black solid', cursor: 'default' }}>
+          {/* Logo */}
+          <div style={{ width: 27, height: 27, left: 6, top: 6, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 6, outline: '1px black solid', outlineOffset: '-1px' }}>
+            <img style={{ width: 31, height: 31, left: -2, top: -2, position: 'absolute' }} src={chicletLogo} alt="Chiclet" draggable={false} />
           </div>
+          <div style={{ left: 37, top: 10, position: 'absolute', color: 'black', fontSize: 13, fontFamily: 'Poppins', fontWeight: '600', pointerEvents: 'none', userSelect: 'none' }}>Chiclet</div>
 
-          <div style={{ display: 'flex', gap: '5px' }}>
-            <button
-              ref={minimizeBtnRef}
-              onClick={handleMinimize}
-              style={headerBtnStyle}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-            >
-              <Minus size={13} />
-            </button>
-            <button
-              onClick={handleClose}
-              style={headerBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#94a3b8'; }}
-            >
-              <X size={13} />
-            </button>
-          </div>
-        </div>
+          {/* Sarı minimize — klasik – işareti */}
+          <button ref={minimizeBtnRef} onClick={handleMinimize} title="Küçült" style={{ width: 26, height: 26, left: 327, top: 7, position: 'absolute', background: '#F7D797', boxShadow: '1px 1px 4px rgba(0,0,0,0.30), 0px 2px 2px rgba(0,0,0,0.25) inset', borderRadius: 8, border: '1px black solid', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 15, fontWeight: '900', lineHeight: 1, color: '#1E1E1E' }}>
+            &#8722;
+          </button>
 
-        {/* İÇERİK */}
-        <div style={{ padding: '28px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          <div style={{
-            width: '68px', height: '68px', borderRadius: '22px',
-            background: accentColor,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 0 30px ${glowColor}`
-          }}>
-            <MessageCircle size={36} color="#fff" fill="#fff" />
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '20px', fontWeight: '800', color: '#fff', margin: 0 }}>
-              Chiclet'e Hoş Geldin
-            </h1>
-            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '5px' }}>
-              Kullanıcı adını gir ve başla
-            </p>
-          </div>
-
-          <form
-            onSubmit={e => { e.preventDefault(); handleLogin(); }}
-            style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}
-          >
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              placeholder="Kullanıcı adın..."
-              autoFocus
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                padding: '12px 14px',
-                background: '#131926',
-                border: shake ? '1.5px solid #ef4444' : `1.5px solid ${accentColor}55`,
-                borderRadius: '12px', color: '#fff', fontSize: '13px',
-                outline: 'none', transition: 'border 0.2s',
-                animation: shake ? 'shake 0.4s' : 'none'
-              }}
-              onFocus={e => e.target.style.borderColor = accentColor}
-              onBlur={e => e.target.style.borderColor = `${accentColor}55`}
-            />
-
-            <button
-              type="submit"
-              style={{
-                width: '100%', padding: '12px',
-                borderRadius: '12px', border: 'none',
-                background: accentColor, color: '#fff',
-                fontWeight: '800', fontSize: '14px', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
-                boxShadow: `0 6px 20px ${glowColor}`,
-                transition: 'opacity 0.15s'
-              }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >
-              Giriş Yap <ArrowRight size={15} />
-            </button>
-          </form>
-
-          <button
-            onClick={onOpenThemeStudio}
-            style={{
-              background: 'transparent', border: 'none',
-              color: '#475569', fontSize: '11.5px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '5px',
-              transition: 'color 0.15s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = '#94a3b8'}
-            onMouseLeave={e => e.currentTarget.style.color = '#475569'}
-          >
-            <Settings size={12} /> Tema Ayarları & Kişiselleştir
+          {/* Kırmızı kapat — klasik × işareti */}
+          <button onClick={handleClose} title="Kapat" style={{ width: 26, height: 26, left: 359, top: 7, position: 'absolute', background: '#F19191', boxShadow: '1px 1px 4px rgba(0,0,0,0.30), 0px 1px 3px rgba(0,0,0,0.25) inset', borderRadius: 8, border: '1px black solid', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 13, fontWeight: '700', lineHeight: 1, color: '#1E1E1E' }}>
+            &#10005;
           </button>
         </div>
-      </div>
 
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          20%, 60% { transform: translateX(-5px); }
-          40%, 80% { transform: translateX(5px); }
-        }
-      `}</style>
+        {/* Ana logo */}
+        <div style={{ width: 129, height: 129, left: 145, top: 93, position: 'absolute', background: 'white', boxShadow: '2px 4px 4px 1px rgba(0,0,0,0.25)', overflow: 'hidden', borderRadius: 30, outline: '1px #FF82CD solid' }}>
+          <img style={{ width: 149, height: 149, left: -10, top: -10, position: 'absolute', border: '1px black solid' }} src={chicletLogo} alt="Chiclet Logo" draggable={false} />
+        </div>
+
+        {/* Başlık metni */}
+        <div style={{ width: 358, height: 83, left: 25, top: 231, position: 'absolute', overflow: 'hidden' }}>
+          <div style={{ left: 37, top: 11, position: 'absolute', color: 'black', fontSize: 28, fontFamily: 'Poppins', fontWeight: '600', whiteSpace: 'nowrap' }}>Chiclet`e Hoş Geldin</div>
+          <div style={{ left: 77, top: 54, position: 'absolute', color: 'rgba(0,0,0,0.75)', fontSize: 15, fontFamily: 'Poppins', fontWeight: '400', letterSpacing: 0.30 }}>Kullanıcı adını gir ve başla</div>
+        </div>
+
+        {/* Input */}
+        <div style={{ width: 347, height: 40, left: 31, top: 334, position: 'absolute', background: '#FCEDF1', boxShadow: '2px 4px 4px 1px rgba(0,0,0,0.40)', overflow: 'hidden', borderRadius: 10 }}>
+          <input type="text" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} autoFocus placeholder="Kullanıcı Adın..." style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', background: 'transparent', border: shake ? '2px solid #ef4444' : 'none', outline: 'none', padding: '0 10px', color: 'black', fontSize: 14, fontFamily: 'Poppins', fontWeight: '500', letterSpacing: 0.28, boxSizing: 'border-box', animation: shake ? 'shake 0.4s' : 'none' }} />
+        </div>
+
+        {/* Giriş Yap butonu */}
+        <div onClick={handleLogin} onMouseDown={() => setBtnPressed(true)} onMouseUp={() => setBtnPressed(false)} onMouseLeave={() => setBtnPressed(false)} style={{ width: 347, height: 40, left: 31, top: 393, position: 'absolute', background: '#A2E5FF', boxShadow: btnPressed ? '0px 0px 0px rgba(0,0,0,0.40)' : '2px 4px 4px 1px rgba(0,0,0,0.40)', overflow: 'hidden', borderRadius: 10, cursor: 'pointer', transform: btnPressed ? 'scale(0.97) translateY(2px)' : 'scale(1) translateY(0px)', transition: 'transform 0.1s ease, box-shadow 0.1s ease' }}>
+          <div style={{ left: 132, top: 6, position: 'absolute', color: 'black', fontSize: 18, fontFamily: 'Poppins', fontWeight: '600', letterSpacing: 0.36, userSelect: 'none' }}>Giriş Yap</div>
+        </div>
+
+        {/* Tema ayarları */}
+        <div onClick={onOpenThemeStudio} style={{ left: 119, top: 456, position: 'absolute', color: 'rgba(0,0,0,0.75)', fontSize: 14, fontFamily: 'Poppins', fontWeight: '400', letterSpacing: 0.28, cursor: 'pointer', userSelect: 'none' }}>Tema Ayarları &amp; Kişiselleştir</div>
+        <div onClick={onOpenThemeStudio} style={{ width: 31, height: 31, left: 91, top: 452, position: 'absolute', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>⚙️</div>
+      </div>
     </div>
   );
 }
-
-const headerBtnStyle = {
-  background: 'rgba(255,255,255,0.07)', border: 'none',
-  color: '#94a3b8', borderRadius: '7px', width: '26px', height: '26px',
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  cursor: 'pointer', transition: 'background 0.15s, color 0.15s'
-};

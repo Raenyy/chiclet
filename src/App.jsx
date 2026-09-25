@@ -15,7 +15,6 @@ function initMousePassthrough() {
   ipcRenderer.send('set-ignore-mouse', true);
 
   const checkMouse = (x, y) => {
-    // KRITIK: Sürükleme sırasında ignore değiştirme — mouseup kaybolmasın
     if (window.__isDragging) return;
 
     const el = document.elementFromPoint(x, y);
@@ -30,10 +29,8 @@ function initMousePassthrough() {
     }
   };
 
-  // Global sürükleme yönetimi — tüm bileşenler bunu kullanır
   window.__startDrag = () => {
     window.__isDragging = true;
-    // Sürükleme boyunca tıklamaları Chiclet yakasın
     if (isIgnoring) {
       isIgnoring = false;
       ipcRenderer.send('set-ignore-mouse', false);
@@ -42,7 +39,6 @@ function initMousePassthrough() {
 
   window.__endDrag = () => {
     window.__isDragging = false;
-    // Sürükleme bitti — mevcut konumu yeniden kontrol et
     setTimeout(() => {
       checkMouse(window.__lastX ?? -1, window.__lastY ?? -1);
     }, 30);
@@ -67,7 +63,6 @@ export default function App() {
     initMousePassthrough();
   }, []);
 
-  // Grup Duvar Kağıdı / Tema Senkronizasyonu (Diğer pencereler/üyeler değiştirdiğinde)
   useEffect(() => {
     const unsubscribe = subscribeToThemeChanges((newTheme) => {
       if (newTheme) {
