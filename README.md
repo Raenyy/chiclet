@@ -1,4 +1,4 @@
-# Chiclet 🎀
+# Chiclet 
 
 <p align="center">
   <img src="public/icon.png" width="96" height="96" alt="Chiclet Logo"/>
