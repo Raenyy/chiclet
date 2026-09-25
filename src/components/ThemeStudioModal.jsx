@@ -602,7 +602,7 @@ export default function ThemeStudioModal({ currentTheme, onSelectTheme, onClose,
                         color: '#000',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
                       }}>
-                        Kendi duvar kağıdım ve balon renklerim 🎀
+                        Kendi duvar kağıdım ve balon renklerim
                       </div>
                     </div>
 
