@@ -18,7 +18,7 @@
 
 ---
 
-## 📸 Ekran Görüntüleri
+##  Ekran Görüntüleri
 
 <p align="center">
   <img src="screenshots/login.png" width="310" alt="Giriş Ekranı"/>
@@ -113,6 +113,6 @@ Oluşturulan taşınabilir `.exe` dosyası `dist_electron` dizininde yer alacakt
 
 ---
 
-## 📄 Lisans
+## Lisans
 
 Bu proje [MIT](LICENSE) lisansı altında sunulmaktadır.
