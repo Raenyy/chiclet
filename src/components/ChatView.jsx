@@ -161,8 +161,21 @@ export default function ChatView({
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+      {/* Sabit Arka Plan: Duvar kağıdı varsa duvar kağıdı, yoksa göz yormayan hafif pembemsi pastel zemin (Scroll ile ASLA kaymaz) */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: currentTheme?.customWallpaper ? 'transparent' : 'rgba(252, 237, 241, 0.95)',
+        backgroundImage: currentTheme?.customWallpaper ? `url(${currentTheme.customWallpaper})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: opacity,
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+
       {!isMiniMode && !isVoiceConnected && (
-        <div style={{ padding: '8px 14px 4px 14px', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div style={{ padding: '8px 14px 4px 14px', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '13px', fontWeight: '700', color: '#333333' }}>@{user || 'Kullaniciadin'}</span>
             {isPushToTalkActive && (
@@ -222,16 +235,9 @@ export default function ChatView({
         flex: 1, padding: isMiniMode ? '6px 8px' : '10px 12px', overflowY: 'auto', overflowX: 'hidden',
         display: 'flex', flexDirection: 'column', gap: '7px', minHeight: 0,
         backgroundColor: 'transparent',
-        position: 'relative'
+        position: 'relative',
+        zIndex: 1
       }}>
-        {currentTheme?.customWallpaper && (
-          <div style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url(${currentTheme.customWallpaper})`,
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            opacity: opacity, pointerEvents: 'none', zIndex: 0
-          }} />
-        )}
         <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1 }} />
         {!isMiniMode && messages.length === 0 && (
           <div style={{ flex: 1, position: 'relative', zIndex: 1 }} />
